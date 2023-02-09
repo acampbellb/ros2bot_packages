@@ -1,0 +1,266 @@
+#!/usr/bin/env python3
+
+import math
+import random
+import rclpy
+
+from sensor_msgs.msg import Imu, MagneticField, JointState
+from geometry_msgs.msg import Twist
+from std_msgs.msg import String, Float32, Int32, Bool
+from ros2bot_master_lib import Ros2botMasterDriver
+from ros2bot_speach_lib import Ros2botSpeachDriver
+from rclpy.node import Node
+
+class Ros2botMasterSpeachDriverNode(Node):
+    def __init__(self):
+        super().__init__("ros2bot_master_driver_node")
+        self.get_logger().info("Hello from ros2bot driver node")
+
+        # initialize state
+        self.RA2DE = 180 / math.pi
+        self.master = Ros2botMasterDriver()
+        self.speach = Ros2botSpeachDriver()
+        self.master.set_car_type(1)
+        self.timer = None
+
+        # declare parameters
+        self.declare_parameter('imu_link', 'imu_link')
+        self.declare_parameter('prefix', '')
+        self.declare_parameter('xlinear_limit', 1.0)
+        self.declare_parameter('ylinear_limit', 1.0)
+        self.declare_parameter('angular_limit', 5.0)
+        self.declare_parameter('process_cmd_freq', 0.3)
+
+        # get parameters
+        self.imu_link = self.get_parameter('imu_link')
+        self.prefix = self.get_parameter('prefix')
+        self.xlinear_limit = self.get_parameter('xlinear_limit')
+        self.ylinear_limit = self.get_parameter('ylinear_limit')
+        self.angular_limit = self.get_parameter('angular_limit')
+        self.process_cmd_freq = self.get_parameter('process_cmd_freq')
+
+        # create subscriptions 
+        self.sub_cmd_velocity = self.create_subscription(Twist, 'cmd_vel', self.cmd_velocity_cb, 1)
+        self.sub_rgb_light = self.create_subscription(Int32, 'rgb_light', self.rgb_light_cb, 100)
+        self.sub_buzzer = self.create_subscription(Bool, 'buzzer', self.buzzer_cb, 100)
+
+        # create publishers w/ relative named topics
+        self.edition_pub = self.create_publisher(Float32, 'edition', 100)
+        self.battery_voltage_pub = self.create_publisher(Float32, 'voltage', 100)
+        self.joint_state_pub = self.create_publisher(JointState, 'joint_states', 100)
+
+        # create publishers w/ absolute named topics
+        self.velocity_pub = self.create_publisher(Twist, '/pub_vel', 100)
+        self.imu_pub = self.create_publisher(Imu, '/pub_imu', 100)
+        self.magnetic_field_pub = self.create_publisher(MagneticField, '/pub_mag', 100)
+
+        # start dirver library's receiving thread
+        self.master.create_receive_thread()
+    
+    def start_timer(self):
+        self.timer = self.create_timer(self.process_cmd_freq, self.process_cmd_cb)
+
+    def cancel_timer(self):
+        if not self.timer.is_canceled:
+            self.timer.cancel()
+
+    def cmd_velocity_cb(self, msg):
+        self.get_logger().info('ros2bot_master_driver node heard velocity msg: "%s"' % msg.data)
+        # car motion control, subscriber callback function
+        if not isinstance(msg, Twist): 
+            return
+
+        # issue linear and angular velocity
+        vx = msg.linear.x
+        vy = msg.linear.y
+        angular = msg.angular.z
+
+        # velocity: ±1, angular: ±5
+        # trolley motion control, velocity=[-1, 1], angular=[-5, 5]
+        self.master.set_car_motion(vx, vy, angular)
+
+    def rgb_light_cb(self, msg):
+        self.get_logger().info('ros2bot_master_driver node heard rgb light msg: "%s"' % msg.data)
+
+        if not isinstance(msg, Int32): 
+            return
+
+        for i in range(3): 
+            self.master.set_colorful_effect(msg.data, 6, parm=1)
+
+    def buzzer_cb(self, msg):
+        self.get_logger().info('ros2bot_master_driver node heard buzzer msg: "%s"' % msg.data)
+
+        if not isinstance(msg, Bool): 
+            return
+
+        if msg.data:
+            for i in range(3): 
+                self.master.set_beep(1)
+        else:
+            for i in range(3): 
+                self.master.set_beep(0)
+
+    def parse_command(self):
+        command = self.speach.speech_read()
+        self.speach.void_write(command)
+
+        if command == 2:
+            vx = 0.0
+            vy = 0.0
+            angular = 0
+            self.master.set_car_motion(vx, vy, angular)
+        elif command == 4:
+            vx = 0.5
+            vy = 0.0
+            angular = 0
+            self.master.set_car_motion(vx, vy, angular)
+        elif command == 5:
+            vx = -0.5
+            vy = 0.0
+            angular = 0
+            self.master.set_car_motion(vx, vy, angular)
+        elif command == 6:
+            vx = 0.2
+            vy = 0.0
+            angular = 0.5
+            self.master.set_car_motion(vx, vy, angular)
+        elif command == 7:
+            vx = 0.2
+            vy = 0.0
+            angular = -0.5
+            self.master.set_car_motion(vx, vy, angular) 
+        elif command == 8:
+            vx = 0.0
+            vy = 0.0
+            angular = 0.5
+            self.master.set_car_motion(vx, vy, angular)
+        elif command == 9:
+            vx = 0.0
+            vy = 0.0
+            angular = -0.5
+            self.master.set_car_motion(vx, vy, angular)
+        elif command == 10:
+            self.master.set_colorful_effect(0, 6, parm=1)
+        elif command == 11:
+            self.master.set_colorful_lamps(0xFF,255,0,0)
+        elif command == 12:
+            self.master.set_colorful_lamps(0xFF,0,255,0)
+        elif command == 13:
+            self.master.set_colorful_lamps(0xFF,0,0,255)
+        elif command == 14:
+            self.master.set_colorful_lamps(0xFF,255,255,0)
+        elif command == 15:
+            self.master.set_colorful_effect(1, 6, parm=1)
+        elif command == 16:
+            self.master.set_colorful_effect(4, 6, parm=1)
+        elif command == 17:
+            self.master.set_colorful_effect(3, 6, parm=1)
+        elif command == 18:
+            self.master.set_colorful_effect(1, 6, parm=1)
+        elif command == 32:
+            print("unhandled")
+        elif command == 33:
+            print("unhandled")
+        elif command == 34:
+            print("unhandled")
+        elif command == 35:
+            print("unhandled")
+        elif command == 36:
+            print("unhandled")
+        elif command == 37:
+            print("unhandled") 
+
+    # Publish the speed of the robot, gyroscope data, and battery voltage
+    def process_cmd_cb(self):
+        if rclpy.ok():
+            # get master driver data
+            ax, ay, az = self.master.get_accelerometer_data()
+            gx, gy, gz = self.master.get_gyroscope_data()
+            mx, my, mz = self.master.get_magnetometer_data()
+            vx, vy, angular = self.master.get_motion_data()
+
+            # initialize imu gyroscope
+            imu = Imu()
+            imu.header.stamp = self.get_clock().now()
+            imu.header.frame_id = self.imu_link
+            imu.linear_acceleration.x = ax
+            imu.linear_acceleration.y = ay
+            imu.linear_acceleration.z = az
+            imu.angular_velocity.x = gx
+            imu.angular_velocity.y = gy
+            imu.angular_velocity.z = gz
+
+            # initialize magnetic gyrocope
+            magnetic_field = MagneticField()
+            magnetic_field.header.stamp = self.get_clock().now()
+            magnetic_field.header.frame_id = self.imu_link
+            magnetic_field.magnetic_field.x = mx
+            magnetic_field.magnetic_field.y = my
+            magnetic_field.magnetic_field.z = mz
+
+            # initialize twist
+            twist = Twist()
+            twist.linear.x = vx
+            twist.linear.y = vy
+            twist.angular.z = angular
+
+            # initialize voltage
+            battery_voltage = Float32()
+            battery_voltage.data = self.master.get_battery_voltage()
+
+            # initialize edition
+            edition = Float32()
+            edition.data = self.master.get_version() 
+
+            # initialize joint state
+            joint_state = JointState()
+            joint_state.header.stamp = self.get_clock().now()
+            joint_state.header.frame_id = "joint_states"
+            if len(self.prefix) == 0:
+                joint_state.name = ["front_right_joint", "front_left_joint",
+                                    "back_right_joint", "back_left_joint"]
+            else:
+                joint_state.name = [self.prefix+"/front_right_joint", self.prefix+"/front_left_joint",
+                                    self.prefix+"/back_right_joint", self.prefix+"/back_left_joint"]
+            joint_state.position = [0, 0, 0, 0]
+            if not vx == vy == angular == 0:
+                i = random.uniform(-3.14, 3.14)
+                joint_state.position = [i, i, i, i]
+
+            # publish the current linear velocity and angular velocity of the master driver
+            self.velocity_pub.publish(twist)
+
+            # publish gyroscope data
+            self.imu_pub.publish(imu)
+            self.magnetic_field_pub.publish(magnetic_field)
+
+            # publish voltage data
+            self.battery_voltage_pub.publish(battery_voltage)
+
+            # publish edition
+            self.edition_pub.publish(edition)
+
+            # publish joint state data (Disabled)
+            # self.joint_state_pub.publish(joint_state)
+
+            # parse speach command
+            self.parse_command()
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = Ros2botMasterSpeachDriverNode()
+    
+    try:
+        node.start_timer()
+        rclpy.spin(node)
+    except Exception as ex:
+        print(ex)
+        print("ros2bot master speach driver node shutting down")
+    finally:
+        node.cancel_timer()
+        node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
