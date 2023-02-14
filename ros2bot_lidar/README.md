@@ -1,6 +1,6 @@
-# ros2bot robot controls package
+# ros2bot laser package
 
-This package contains control nodes for the ros2bot robot.
+Laser package for ros2bot's Slamtec S2 RPLIDAR lidar.
 
 ## Package composition
 
@@ -8,18 +8,18 @@ This package contains control nodes for the ros2bot robot.
 
     ```
     $ cd ~/ros2bot_ws/src/
-    $ ros2 pkg create ros2bot_controls --build-type ament_python 
+    $ ros2 pkg create ros2bot_lidar --build-type ament_python 
     ```
 
     The drivers package contents should look like this:
 
     ```
-    ros2bot_controls/
-    ├── ros2bot_controls
+    ros2bot_lidar/
+    ├── ros2bot_lidar
     │   └── __init__.py
     ├── package.xml
     ├── resource
-    │   └── ros2bot_controls
+    │   └── ros2bot_lidar
     ├── setup.cfg
     ├── setup.py
     └── test
@@ -45,10 +45,16 @@ This package contains control nodes for the ros2bot robot.
     $ colcon build
     ```
 
-## Compose control nodes within the package
+4.  Compose package nodes (avoidance, tracking, warning) see source code.
 
-1.  Write nodes (see source)
+5.  Add entrypoints to 'setup.py'
 
-2.  Add entrypoints to setup.py
-
-3.  Add dependencies to package.xml
+    ```
+    entry_points={
+        'console_scripts': [
+            'lidar_avoidance_node = ros2bot_lidar.ros2bot_lidar_avoidance_node:main',
+            'lidar_tracking_node = ros2bot_lidar.ros2bot_lidar_tracking_node:main',
+            'lidar_warning_node = ros2bot_lidar.ros2bot_lidar_warning_node:main'
+        ],
+    },
+    ```

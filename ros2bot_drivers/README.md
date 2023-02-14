@@ -73,3 +73,5 @@ Build the driver nodes within the package.
 
     master_driver_node & speach_driver_node are the names of the executables of the nodes.
 
+5.  Add dependencies to package.xml
+

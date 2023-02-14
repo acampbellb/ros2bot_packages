@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -14,7 +16,7 @@ def generate_launch_description():
         parameters=[
             {"odom_frame": "odom"},
             {"base_footprint_frame": "base_footprint"},
-            {"linear_scale_x": 1.0},
+            {"linear_scale_x": 1.1},
             {"linear_scale_y": 1.0}
         ],
         remappings=[
@@ -23,10 +25,10 @@ def generate_launch_description():
         ]
     )
 
-    # robot low-level driver node
-    master_driver_node = Node(
+    # robot low-level speach driver node
+    speach_driver_node = Node(
         package="ros2bot_drivers",
-        executable="master_driver_node",
+        executable="speach_driver_node",
         parameters=[
             {"xlinear_speed_limit": 1.0},
             {"ylinear_speed_limit": 1.0},
@@ -96,20 +98,20 @@ def generate_launch_description():
     )
 
     # included joy control node launch
-    joy_control_node = IncludeLaunchDescription(
+    joy_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
     )
 
     # add nodes to launch description
     ld.add_action(base_robot_node)
-    ld.add_action(master_driver_node)
+    ld.add_action(speach_driver_node)
     ld.add_action(robot_state_publisher_node)
     ld.add_action(joint_state_publisher_node)
     ld.add_action(joint_state_publisher_gui_node)
     ld.add_action(imu_filter_node)
     ld.add_action(localization_node)
-    ld.add_action(joy_control_node)
+    ld.add_action(joy_control_launch)
 
     # return launch description
     return ld
