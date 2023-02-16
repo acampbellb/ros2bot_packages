@@ -20,7 +20,7 @@ class Ros2botMasterSpeachDriverNode(Node):
         self.RA2DE = 180 / math.pi
         self.master = Ros2botMasterDriver()
         self.speach = Ros2botSpeachDriver()
-        self.master.set_car_type(1)
+        self.master.set_bot_type(1)
         self.timer = None
 
         # declare parameters
@@ -66,7 +66,7 @@ class Ros2botMasterSpeachDriverNode(Node):
 
     def cmd_velocity_cb(self, msg):
         self.get_logger().info('ros2bot_master_driver node heard velocity msg: "%s"' % msg.data)
-        # car motion control, subscriber callback function
+        # robot motion control, subscriber callback function
         if not isinstance(msg, Twist): 
             return
 
@@ -77,7 +77,7 @@ class Ros2botMasterSpeachDriverNode(Node):
 
         # velocity: ±1, angular: ±5
         # trolley motion control, velocity=[-1, 1], angular=[-5, 5]
-        self.master.set_car_motion(vx, vy, angular)
+        self.master.set_bot_motion(vx, vy, angular)
 
     def rgb_light_cb(self, msg):
         self.get_logger().info('ros2bot_master_driver node heard rgb light msg: "%s"' % msg.data)
@@ -109,37 +109,37 @@ class Ros2botMasterSpeachDriverNode(Node):
             vx = 0.0
             vy = 0.0
             angular = 0
-            self.master.set_car_motion(vx, vy, angular)
+            self.master.set_bot_motion(vx, vy, angular)
         elif command == 4:
             vx = 0.5
             vy = 0.0
             angular = 0
-            self.master.set_car_motion(vx, vy, angular)
+            self.master.set_bot_motion(vx, vy, angular)
         elif command == 5:
             vx = -0.5
             vy = 0.0
             angular = 0
-            self.master.set_car_motion(vx, vy, angular)
+            self.master.set_bot_motion(vx, vy, angular)
         elif command == 6:
             vx = 0.2
             vy = 0.0
             angular = 0.5
-            self.master.set_car_motion(vx, vy, angular)
+            self.master.set_bot_motion(vx, vy, angular)
         elif command == 7:
             vx = 0.2
             vy = 0.0
             angular = -0.5
-            self.master.set_car_motion(vx, vy, angular) 
+            self.master.set_bot_motion(vx, vy, angular) 
         elif command == 8:
             vx = 0.0
             vy = 0.0
             angular = 0.5
-            self.master.set_car_motion(vx, vy, angular)
+            self.master.set_bot_motion(vx, vy, angular)
         elif command == 9:
             vx = 0.0
             vy = 0.0
             angular = -0.5
-            self.master.set_car_motion(vx, vy, angular)
+            self.master.set_bot_motion(vx, vy, angular)
         elif command == 10:
             self.master.set_colorful_effect(0, 6, parm=1)
         elif command == 11:

@@ -52,7 +52,7 @@ class Ros2botSpeachDriverNode(Node):
 
 		# linear: ±1, angular: ±5
 		# trolley motion control,vesl=[-1, 1], angular=[-5, 5]
-        self.master.set_car_motion(vx, vy, angular)
+        self.master.set_bot_motion(vx, vy, angular)
 
     def joy_state_cb(self, msg):
         self.get_logger().info('ros2bot_speach_driver node heard joy state msg: "%s"' % msg.data)
@@ -71,43 +71,43 @@ class Ros2botSpeachDriverNode(Node):
                 vx = 0.0
                 vy = 0.0
                 angular = 0
-                self.master.set_car_motion(vx, vy, angular)
+                self.master.set_bot_motion(vx, vy, angular)
                 self.speach.void_write(speech_r)
             elif speech_r == 4:
                 vx = 0.5
                 vy = 0.0
                 angular = 0
-                self.master.set_car_motion(vx, vy, angular)
+                self.master.set_bot_motion(vx, vy, angular)
                 self.speach.void_write(speech_r)
             elif speech_r == 5:
                 vx = -0.5
                 vy = 0.0
                 angular = 0
-                self.master.set_car_motion(vx, vy, angular)
+                self.master.set_bot_motion(vx, vy, angular)
                 self.speach.void_write(speech_r)
             elif speech_r == 6:
                 vx = 0.2
                 vy = 0.0
                 angular = 0.5
-                self.master.set_car_motion(vx, vy, angular)
+                self.master.set_bot_motion(vx, vy, angular)
                 self.speach.void_write(speech_r)
             elif speech_r == 7:
                 vx = 0.2
                 vy = 0.0
                 angular = -0.5
-                self.master.set_car_motion(vx, vy, angular) 
+                self.master.set_bot_motion(vx, vy, angular) 
                 self.speach.void_write(speech_r)
             elif speech_r == 8:
                 vx = 0.0
                 vy = 0.0
                 angular = 0.5
-                self.master.set_car_motion(vx, vy, angular)
+                self.master.set_bot_motion(vx, vy, angular)
                 self.speach.void_write(speech_r)
             elif speech_r == 9:
                 vx = 0.0
                 vy = 0.0
                 angular = -0.5
-                self.master.set_car_motion(vx, vy, angular)
+                self.master.set_bot_motion(vx, vy, angular)
                 self.speach.void_write(speech_r)
             elif speech_r == 11:
                 self.master.set_colorful_lamps(0xFF,255,0,0)

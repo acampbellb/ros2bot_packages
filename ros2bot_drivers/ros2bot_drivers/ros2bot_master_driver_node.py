@@ -18,7 +18,7 @@ class Ros2botMasterDriverNode(Node):
         # initialize state
         self.RA2DE = 180 / math.pi
         self.master = Ros2botMasterDriver()
-        self.master.set_car_type(1)
+        self.master.set_bot_type(1)
         self.timer = None
 
         # declare parameters
@@ -64,7 +64,7 @@ class Ros2botMasterDriverNode(Node):
 
     def cmd_velocity_cb(self, msg):
         self.get_logger().info('ros2bot_master_driver node heard velocity msg: "%s"' % msg.data)
-        # car motion control, subscriber callback function
+        # robot motion control, subscriber callback function
         if not isinstance(msg, Twist): 
             return
 
@@ -75,7 +75,7 @@ class Ros2botMasterDriverNode(Node):
 
         # velocity: ±1, angular: ±5
         # trolley motion control, velocity=[-1, 1], angular=[-5, 5]
-        self.master.set_car_motion(vx, vy, angular)
+        self.master.set_bot_motion(vx, vy, angular)
 
     def rgb_light_cb(self, msg):
         self.get_logger().info('ros2bot_master_driver node heard rgb light msg: "%s"' % msg.data)
