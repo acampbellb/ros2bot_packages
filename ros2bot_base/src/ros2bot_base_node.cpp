@@ -32,10 +32,10 @@ public:
         RCLCPP_INFO(this->get_logger(), "[Ros2botBaseNode]: initializing");
 
         // declare parameters w/ defaults
-        this->declare_parameter("linear_scale_x", 0.0);
-        this->declare_parameter("linear_scale_y", 0.0);
-        this->declare_parameter("odom_frame", "");
-        this->declare_parameter("base_footprint_frame", "");
+        this->declare_parameter("linear_scale_x", 1.0);
+        this->declare_parameter("linear_scale_y", 1.0);
+        this->declare_parameter("odom_frame", "odom");
+        this->declare_parameter("base_footprint_frame", "base_footprint");
 
         // get parameters
         rclcpp::Parameter linear_scale_x_param = this->get_parameter("linear_scale_x");
@@ -46,7 +46,7 @@ public:
         // convert parameters to field values
         linear_scale_x_ = linear_scale_x_param.as_double();
         linear_scale_y_ = linear_scale_y_param.as_double();
-        odometry_frame_ = odom_frame_param.as_string();
+        odom_frame_ = odom_frame_param.as_string();
         base_footprint_frame_ = base_footprint_frame_param.as_string();
 
         // initialize remaining fields
@@ -74,7 +74,7 @@ private:
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odometry_publisher_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr velocity_subscriber_;
     rclcpp::Time last_velocity_time_;
-    std::string odometry_frame_;
+    std::string odom_frame_;
     std::string base_footprint_frame_;
     double linear_scale_x_;
     double linear_scale_y_;
@@ -119,7 +119,7 @@ private:
         nav_msgs::msg::Odometry odometry_msg;
 
         odometry_msg.header.stamp = current_time;
-        odometry_msg.header.frame_id = odometry_frame_;
+        odometry_msg.header.frame_id = odom_frame_;
         odometry_msg.child_frame_id = base_footprint_frame_;
 
         // robot position as x, y, z
