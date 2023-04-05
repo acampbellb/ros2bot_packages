@@ -7,12 +7,16 @@ Panels:
         - /Global Options1
         - /Status1
         - /TF1/Frames1
+        - /Imu2
+        - /Imu2/Axes properties1
+        - /Imu2/Acceleration properties1        
       Splitter Ratio: 0.5
     Tree Height: 752
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
     Expanded:
+      - /2D Pose Estimate1    
       - /2D Nav Goal1
       - /Publish Point1
     Name: Tool Properties

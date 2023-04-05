@@ -11,9 +11,9 @@ def generate_launch_description():
         package="ros2bot_drivers",
         executable="master_driver_node",
         parameters=[
-            {"xlinear_speed_limit" : 1.0},
-            {"ylinear_speed_limit" : 1.0},
-            {"angular_speed_limit" : 5.0},
+            {"xlinear_limit" : 1.0},
+            {"ylinear_limit" : 1.0},
+            {"angular_limit" : 5.0},
             {"imu_link" : "imu_link"}
         ],
         remappings=[
