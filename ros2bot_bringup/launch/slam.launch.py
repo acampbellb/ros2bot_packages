@@ -27,10 +27,10 @@ def generate_launch_description():
             FindPackageShare("ros2bot_bringup"), '/launch', '/master_bringup.launch.py'])
     )   
 
-    # include lidar base launch
-    lidar_base_launch = IncludeLaunchDescription(
+    # include lidar node launch
+    lidar_node_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/lidar_base.launch.py'])
+            FindPackageShare("ros2bot_bringup"), '/launch', '/lidar_node.launch.py'])
     )  
 
     # slam toolbox mapping node
@@ -80,7 +80,7 @@ def generate_launch_description():
         sim_time_arg,
         rviz_config_arg,
         master_bringup_launch,
-        lidar_base_launch,
+        lidar_node_launch,
         slam_toolbox_mapping_node,
         slam_toolbox_localization_node,
         rviz_node
