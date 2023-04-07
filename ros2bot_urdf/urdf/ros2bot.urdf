@@ -182,7 +182,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/sensor/laser_link.STL"/>
+                <mesh filename="package://ros2bot_urdf/meshes/sensor/laser_link.STL"/>
             </geometry>
             <material name="">
                 <color rgba="0.7 0.7 0.7 1"/>
@@ -191,7 +191,7 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/sensor/laser_link.STL"/>
+                <mesh filename="package://ros2bot_urdf/meshes/sensor/laser_link.STL"/>
             </geometry>
         </collision>
     </link>
@@ -211,7 +211,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/sensor/camera_link.STL"/>
+                <mesh filename="package://ros2bot_urdf/meshes/sensor/camera_link.STL"/>
             </geometry>
             <material name="">
                 <color rgba="0.7 0.7 0.7 1"/>
@@ -220,7 +220,7 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://yahboomcar_description/meshes/sensor/camera_link.STL"/>
+                <mesh filename="package://ros2bot_urdf/meshes/sensor/camera_link.STL"/>
             </geometry>
         </collision>
     </link>  
