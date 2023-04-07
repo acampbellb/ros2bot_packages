@@ -9,9 +9,9 @@ from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
-    pkg_path = get_package_share_path('ros2bot_urdf')
-    urdf_path = pkg_path / 'urdf/ros2bot.urdf'
-    rviz_config_path = pkg_path / 'rviz/model.rviz'
+    package_path = get_package_share_path('ros2bot_urdf')
+    urdf_path = package_path / 'urdf/ros2bot.urdf'
+    rviz_config_path = package_path / 'config/robot.rviz'
 
     gui_arg = DeclareLaunchArgument(name='use_gui', default_value='true', choices=['true', 'false'],
                                     description='Flag to enable joint_state_publisher_gui')

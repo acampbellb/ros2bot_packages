@@ -15,9 +15,9 @@ from ament_index_python.packages import get_package_share_directory
 from ament_index_python.packages import get_package_share_path
 
 def generate_launch_description():
-    pkg_path = get_package_share_path('ros2bot_urdf')
-    model_path = pkg_path / 'urdf/ros2bot.urdf'
-    rviz_config_path = pkg_path / 'rviz/model.rviz'
+    package_path = get_package_share_path('ros2bot_urdf')
+    model_path = package_path / 'urdf/ros2bot.urdf'
+    rviz_config_path = package_path / 'config/robot.rviz'
 
     gui_arg = DeclareLaunchArgument(name='use_gui', default_value='false', choices=['true', 'false'],
                                     description='Flag to enable GUI')    

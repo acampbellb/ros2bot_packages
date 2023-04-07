@@ -17,7 +17,7 @@ def generate_launch_description():
                                             description='Flag to start slam in localization mode')  
     sim_time_arg = DeclareLaunchArgument(name='use_sim_time', default_value='false', choices=['true', 'false'],
                                         description='Flag to use simulation / gazebo clock') 
-    rviz_config_path = get_package_share_directory("ros2bot_slam") + '/config/slam_rviz.yaml'
+    rviz_config_path = get_package_share_directory("ros2bot_slam") + '/config/slam_toolbox.yaml'
     rviz_config_arg = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
                                             description='Absolute path to rviz config file') 
     
@@ -36,31 +36,25 @@ def generate_launch_description():
     # slam toolbox mapping node
     slam_toolbox_mapping_node = Node(
         package='slam_toolbox',
-        executable='sync_slam_toolbox_node',
+        executable='async_slam_toolbox_node',
         name='slam_toolbox',
         output='screen',
         condition=UnlessCondition(LaunchConfiguration('localization_mode')),   
         parameters=[
-        	get_package_share_directory("ros2bot_slam") + '/config/mapping_params_online_sync.yaml'
-        ],
-        remappings=[
-            ('odom','odom_combined')
+        	get_package_share_directory("ros2bot_slam") + '/config/mapper_params_online_async.yaml'
         ]
     )
 
     # slam toolbox localization node
     slam_toolbox_localization_node = Node(
         package='slam_toolbox',
-        executable='sync_slam_toolbox_node',
+        executable='async_slam_toolbox_node',
         name='slam_toolbox',
         output='screen',
         condition=IfCondition(LaunchConfiguration('localization_mode')),
         parameters=[
-        	get_package_share_directory("ros2bot_slam") + '/config/localization_params_online_sync.yaml',
+        	get_package_share_directory("ros2bot_slam") + '/config/mapper_params_localization.yaml',
             {'use_sim_time' : LaunchConfiguration('use_sim_time')}
-        ],
-        remappings=[
-            ('odom','odom_combined')
         ]
     )
 
