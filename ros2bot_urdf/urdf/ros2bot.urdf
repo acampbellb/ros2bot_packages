@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot name="wheeltec_robot">
+<robot name="ros2bot">
 
     <link name="base_link">
         <visual>
