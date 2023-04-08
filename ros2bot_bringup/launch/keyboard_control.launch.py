@@ -8,9 +8,9 @@ def generate_launch_description():
 
     # robot keyboard control node
     keyboard_control_node = Node(
+        name="keyboard_control",        
         package="ros2bot_controls",
         executable="keyboard_node",
-        name="keyboard_control_node",
         parameters=[
             {"linear_speed_limit" : 1.0},
             {"angular_speed_limit" : 5.0}

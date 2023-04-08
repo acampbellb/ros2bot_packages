@@ -33,6 +33,7 @@ def generate_launch_description():
 
     # robot odometry publisher
     base_robot_node = Node(
+        name="ros2bot_base",
         package="ros2bot_base",
         executable="ros2bot_base_node",
         parameters=[
@@ -49,6 +50,7 @@ def generate_launch_description():
 
     # robot low-level speach driver node
     speach_driver_node = Node(
+        name="speach_driver",
         package="ros2bot_drivers",
         executable="speach_driver_node",
         parameters=[
@@ -65,28 +67,29 @@ def generate_launch_description():
     )
 
     robot_state_publisher_node = Node(
+        name="robot_state_publisher",        
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        name="robot_state_publisher",
         parameters=[{'robot_description': robot_description}]
     )
 
     joint_state_publisher_node = Node(
+        name="robot_state_publisher",        
         package="joint_state_publisher",
         executable="joint_state_publisher",
-        name="join_state_publisher",
         condition=UnlessCondition(LaunchConfiguration('use_gui')) 
     )
 
     joint_state_publisher_gui_node = Node(
+        name="joint_state_publisher_gui",        
         package="joint_state_publisher_gui",
         executable="joint_state_publisher_gui",
-        name="joint_state_publisher",
         condition=IfCondition(LaunchConfiguration('use_gui'))
     )
 
     # filter and fuse imu data
     imu_filter_node = Node(
+        name="imu_filter",
         package="imu_filter_madgwick",
         executable="imu_filter_node",
         parameters=[
@@ -114,6 +117,7 @@ def generate_launch_description():
         )
 
     localization_node = Node(
+        name="robot_localization",
         package="robot_localization",
         executable="ekf_localization_node",
         output="screen",
@@ -137,9 +141,9 @@ def generate_launch_description():
     )
 
     rviz_node = Node(
+        name='rviz2',        
         package='rviz2',
         executable='rviz2',
-        name='rviz2',
         output='screen',
         condition=IfCondition(LaunchConfiguration('use_reviz')),
         arguments=['-d', LaunchConfiguration('rviz_config')]

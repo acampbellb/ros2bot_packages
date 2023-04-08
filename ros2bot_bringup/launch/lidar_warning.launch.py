@@ -17,9 +17,9 @@ def generate_launch_description():
 
     # ros2bot lidar warning node
     lidar_warning_node = Node(
+        name="lidar_warning",        
         package="ros2bot_lidar",
         executable="lidar_warning_node",
-        name="lidar_warning_node",
         parameters=[
             {"switch" : False},
             {"laser_angle" : 70},

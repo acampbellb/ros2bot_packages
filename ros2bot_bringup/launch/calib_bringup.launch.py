@@ -34,6 +34,7 @@ def generate_launch_description():
 
     # robot odometry publisher
     base_robot_node = Node(
+        name="ros2bot_base",
         package="ros2bot_base",
         executable="ros2bot_base_node",
         parameters=[
@@ -50,6 +51,7 @@ def generate_launch_description():
 
     # robot low-level driver node
     master_driver_node = Node(
+        name="msater_driver",
         package="ros2bot_drivers",
         executable="master_driver_node",
         output="screen",
@@ -68,6 +70,7 @@ def generate_launch_description():
 
     # filter and fuse imu data
     imu_filter_node = Node(
+        name="imu_filter",
         package="imu_filter_madgwick",
         executable="imu_filter_node",
         output="screen",
@@ -96,6 +99,7 @@ def generate_launch_description():
         )
 
     localization_node = Node(
+        name="robot_localization",
         package="robot_localization",
         executable="ekf_localization_node",
         output="screen",
@@ -113,23 +117,23 @@ def generate_launch_description():
     )   
 
     joint_state_publisher_node = Node(
+        name="join_state_publisher",        
         package="joint_state_publisher",
         executable="joint_state_publisher",
-        name="join_state_publisher",
         condition=UnlessCondition(LaunchConfiguration('use_gui'))     
     )
 
     joint_state_publisher_gui_node = Node(
+        name="joint_state_publisher_gui",        
         package="joint_state_publisher_gui",
         executable="joint_state_publisher_gui",
-        name="joint_state_publisher",
         condition=IfCondition(LaunchConfiguration('use_gui'))
     )    
 
     robot_state_publisher_node = Node(
+        name="robot_state_publisher",        
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        name="robot_state_publisher",
         parameters=[{'robot_description': robot_description}]
     )      
 

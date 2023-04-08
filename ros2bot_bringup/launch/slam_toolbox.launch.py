@@ -35,9 +35,9 @@ def generate_launch_description():
 
     # slam toolbox mapping node
     slam_toolbox_mapping_node = Node(
+        name='slam_toolbox_mapping',        
         package='slam_toolbox',
         executable='async_slam_toolbox_node',
-        name='slam_toolbox',
         output='screen',
         condition=UnlessCondition(LaunchConfiguration('localization_mode')),   
         parameters=[
@@ -47,9 +47,9 @@ def generate_launch_description():
 
     # slam toolbox localization node
     slam_toolbox_localization_node = Node(
+        name='slam_toolbox_localization',        
         package='slam_toolbox',
         executable='async_slam_toolbox_node',
-        name='slam_toolbox',
         output='screen',
         condition=IfCondition(LaunchConfiguration('localization_mode')),
         parameters=[
@@ -60,9 +60,9 @@ def generate_launch_description():
 
     # rviz node
     rviz_node = Node(
+        name='rviz2',        
         package='rviz2',
         executable='rviz2',
-        name='rviz2',
         output='screen',
         condition=IfCondition(LaunchConfiguration('use_rviz')),
         arguments=['-d', LaunchConfiguration('rviz_config')]

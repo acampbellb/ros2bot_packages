@@ -30,21 +30,23 @@ def generate_launch_description():
 
     # depending on gui parameter, either launch joint_state_publisher or joint_state_publisher_gui
     joint_state_publisher_node = Node(
+        name="joint_state_publisher",
         package='joint_state_publisher',
         executable='joint_state_publisher',
         condition=UnlessCondition(LaunchConfiguration('use_gui'))
     )
 
     joint_state_publisher_gui_node = Node(
+        name="joint_state_publisher_gui",
         package='joint_state_publisher_gui',
         executable='joint_state_publisher_gui',
         condition=IfCondition(LaunchConfiguration('use_gui'))
     )     
 
     rviz_node = Node(
+        name='rviz2',        
         package='rviz2',
         executable='rviz2',
-        name='rviz2',
         output='screen',
         arguments=['-d', LaunchConfiguration('rviz_config')],
     )

@@ -8,6 +8,7 @@ def generate_launch_description():
 
     # robot low-level driver node
     master_driver_node = Node(
+        name="master_driver",
         package="ros2bot_drivers",
         executable="master_driver_node",
         parameters=[

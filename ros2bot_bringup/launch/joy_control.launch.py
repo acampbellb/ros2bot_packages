@@ -8,9 +8,9 @@ def generate_launch_description():
 
     # robot joy control node
     joy_control_node = Node(
+        name="joy_control_node",        
         package="ros2bot_controls",
         executable="joy_node",
-        name="joy_control_node",
         parameters=[
             {"linear_speed_limit" : 1.0},
             {"angular_speed_limit" : 5.0}
@@ -19,9 +19,9 @@ def generate_launch_description():
 
     # joy node
     joy_node = Node(
+        name="joy",
         package="joy",
         executable="joy_node",
-        name="joy_node"
     )
 
     # add nodes to launch description
