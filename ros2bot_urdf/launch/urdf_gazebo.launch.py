@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
+import os
+
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription
 from launch_ros.substitutions import FindPackageShare
 from launch import LaunchDescription
-from launch.substitutions import LaunchConfiguration
-from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 
@@ -35,19 +35,40 @@ def generate_launch_description():
         ]
     )   
 
+    model_file =  os.path.join(
+        get_package_share_directory('ros2bot_urdf'),
+        'urdf',
+        'ros2bot.urdf'
+    )
+
+    spawn_model = Node(
+        name="spawn_model",
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        output="screen",
+        arguments=[
+            '-entity','ros2bot',
+            '-x', '0',
+            '-y', '0',
+            '-z', '0',
+            '-file', model_file
+        ]
+    )
+
     # joint calibaration 
     fake_joint_calibration = Node(
         name="fake_joint_calibration",
         package="ros2topic",
         executable="ros2topic",
         arguments=[
-            'pub -r 10 /calibrated std_msgs/msg/Bool "{data: true}"'        
+            "pub -r 10 /calibrated std_msgs/msg/Bool '{data:true}'"
         ]
     ) 
 
     ld = LaunchDescription([
         gazebo_launch,
         tf_footprint_base,
+        spawn_model,
         fake_joint_calibration
     ])
 
