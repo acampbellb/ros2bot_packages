@@ -38,90 +38,36 @@ def generate_launch_description():
 
     robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('urdf_model')]),
                                        value_type=str)   
+    
+    # include base robot launch
+    base_robot_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/base_robot.launch.py'])
+    )  
+
+    # include master driver launch
+    master_driver_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/master_driver.launch.py'])
+    )   
+
+    # included imu filter node launch
+    imu_filter_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/imu_filter.launch.py'])
+    )       
   
-    # robot odometry publisher
-    base_robot_node = Node(
-        name="ros2bot_base",
-        package="ros2bot_base",
-        executable="ros2bot_base_node",
-        parameters=[
-            {"odom_frame": "odom"},
-            {"base_footprint_frame": "base_footprint"},
-            {"linear_scale_x": 1.1},
-            {"linear_scale_y": 1.0}
-        ],
-        remappings=[
-            ("/sub_vel", "/vel_raw"),
-            ("/pub_odom", "/odom_raw"),
-        ]
-    )
+    # include robot localization launch
+    robot_localization_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/robot_localization.launch.py'])
+    ) 
 
-    # robot low-level driver node
-    master_driver_node = Node(
-        name="msater_driver",
-        package="ros2bot_drivers",
-        executable="master_driver_node",
-        output="screen",
-        parameters=[
-            {"xlinear_limit" : 1.0},
-            {"ylinear_limit" : 1.0},
-            {"angular_limit" : 5.0},
-            {"imu_link" : "imu_link"}
-        ],
-        remappings=[
-            ("/pub_vel", "/imu/vel_raw"),
-            ("/pub_imu", "/imu/imu_raw"),    
-            ("/pub_mag", "/mag/mag_raw")        
-        ]
-    )
-
-    # filter and fuse imu data
-    imu_filter_node = Node(
-        name="imu_filter",
-        package="imu_filter_madgwick",
-        executable="imu_filter_node",
-        output="screen",
-        parameters=[
-            {"fixed_frame": "base_link"},
-            {"use_mag": True},
-            {"publish_tf": False},
-            {"use_magnetic_field_msg": True},
-            {"world_frame": "enu"},
-            {"orientation_stddev": 0.05},
-            {"angular_scale": 1.08},
-        ],
-        remapping=[
-            ("/sub_imu", "/imu/imu_calib"),
-            ("/sub_mag", "/mag/mag_calib"),
-            ("/pub_imu", "/imu/imu_data"),
-            ("/pub_mag", "/mag/mag_field"),
-        ]
-    )   
-
-    # extended kalman data fusion    
-    localization_config = os.path.join(
-        get_package_share_directory('ros2bot_bringup'),
-        'config',
-        'robot_localization.yaml'
-    )
-
-    localization_node = Node(
-        name="robot_localization",
-        package="robot_localization",
-        executable="ekf_localization_node",
-        output="screen",
-        parameters=[
-            {"odom_frame": "/odom"},
-            {"world_frame": "/odom"},
-            {"base_link_frame": "/base_footprint"},
-            localization_config
-        ],
-        remapping=[
-            ("odometry/filtered", "odom"),
-            ("/imu0", "/imu/imu_data"),
-            ("/odom0", "odom_raw"),
-        ]
-    )   
+    # included joy control node launch
+    joy_control_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
+    )     
 
     joint_state_publisher_node = Node(
         name="join_state_publisher",        
@@ -144,22 +90,16 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_description}]
     )      
 
-    # included joy control node launch
-    joy_control_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
-    )    
-
     # add nodes to launch description
     ld = LaunchDescription([
         use_gui,
         use_rviz,
         urdf_model,
         rviz_config,
-        base_robot_node,
-        master_driver_node,
-        imu_filter_node,
-        localization_node,
+        base_robot_launch,
+        master_driver_launch,
+        imu_filter_launch,
+        robot_localization_launch,
         joint_state_publisher_gui_node,
         joint_state_publisher_node,
         robot_state_publisher_node,
