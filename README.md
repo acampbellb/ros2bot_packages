@@ -1,6 +1,6 @@
-# ros2bot packages
+# ROS2BOT packages
 
-This repository contains ROS2 packages for the ROS2BOT.
+This repository contains ROS2 packages for the ros2bot.
 
-ROS2BOT is a educational robot composed of a mecanum omnidirectional base with 
-an S2 rplidar sensor and a Stereolabs ZED 2i depth camera.
+ros2bot is an educational robot composed of a mecanum omnidirectional base with 
+a Slamtec S2 rplidar laser sensor and Stereolabs ZED 2i depth camera.
