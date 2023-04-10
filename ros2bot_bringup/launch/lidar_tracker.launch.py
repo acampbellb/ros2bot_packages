@@ -9,7 +9,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 def generate_launch_description():
     ld = LaunchDescription()
 
-    # included ros2bot base lidar launch
+    # include ros2bot base lidar launch
     lidar_base_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("ros2bot_bringup"), '/launch', '/lidar_base.launch.py'])

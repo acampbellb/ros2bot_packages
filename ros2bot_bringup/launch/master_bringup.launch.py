@@ -38,7 +38,12 @@ def generate_launch_description():
 
     robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('urdf_model')]),
                                        value_type=str)   
-          
+    
+    # include master driver launch
+    master_driver_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/master_driver.launch.py'])
+    )           
 
     # robot odometry publisher
     base_robot_node = Node(
@@ -53,24 +58,6 @@ def generate_launch_description():
         remappings=[
             ("/sub_vel", "/vel_raw"),
             ("/pub_odom", "/odom_raw"),
-        ]
-    )
-
-    # robot low-level master driver node
-    master_driver_node = Node(
-        name="master_driver",
-        package="ros2bot_drivers",
-        executable="master_driver_node",
-        parameters=[
-            {"xlinear_limit": 1.0},
-            {"ylinear_limit": 1.0},
-            {"angular_limit": 5.0},
-            {"imu_link": "imu_link"}
-        ],
-        remappings=[
-            ("/pub_vel", "/vel_raw"),
-            ("/pub_imu", "/imu/imu_raw"),
-            ("/pub_mag", "/mag/mag_raw")
         ]
     )
 
@@ -164,7 +151,7 @@ def generate_launch_description():
         urdf_model,
         rviz_config,
         base_robot_node,
-        master_driver_node,
+        master_driver_launch,
         joint_state_publisher_gui_node,
         joint_state_publisher_node,
         robot_state_publisher_node,        

@@ -26,7 +26,7 @@ def generate_launch_description():
 
     use_gui = DeclareLaunchArgument(name='use_gui', default_value='true', choices=['true', 'false'],
                                     description='Flag to enable joint_state_publisher_gui')
-    urdf_model = DeclareLaunchArgument(name='urdf_model', default_value=str(urdf_path),
+    urdf_model = DeclareLaunchArgument(name='urdf_model', default_value=str(urdf_model_path),
                                       description='Absolute path to robot urdf file')
     rviz_config = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
                                      description='Absolute path to rviz config file')  

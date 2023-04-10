@@ -38,6 +38,12 @@ def generate_launch_description():
 
     robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('urdf_model')]),
                                        value_type=str)  
+    
+    # include speach driver launch
+    speach_driver_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/speach_driver.launch.py'])
+    ) 
 
     # robot odometry publisher
     base_robot_node = Node(
@@ -53,24 +59,6 @@ def generate_launch_description():
         remappings=[
             ("/sub_vel", "/vel_raw"),
             ("/pub_odom", "/odom_raw"),
-        ]
-    )
-
-    # robot low-level speach driver node
-    speach_driver_node = Node(
-        name="speach_driver",
-        package="ros2bot_drivers",
-        executable="speach_driver_node",
-        parameters=[
-            {"xlinear_speed_limit": 1.0},
-            {"ylinear_speed_limit": 1.0},
-            {"angular_speed_limit": 5.0},
-            {"imu_link": "imu_link"}
-        ],
-        remappings=[
-            ("/pub_vel", "/vel_raw"),
-            ("/pub_imu", "/imu/imu_raw"),
-            ("/pub_mag", "/mag/mag_raw")
         ]
     )
 
@@ -165,7 +153,7 @@ def generate_launch_description():
         urdf_model,
         rviz_config,
         base_robot_node,
-        speach_driver_node,
+        speach_driver_launch,
         joint_state_publisher_gui_node,
         joint_state_publisher_node,
         robot_state_publisher_node,
