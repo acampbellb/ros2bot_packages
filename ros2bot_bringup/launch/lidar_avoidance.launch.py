@@ -29,9 +29,8 @@ def generate_launch_description():
         ]
     )
 
-    # add nodes to launch description
+    # launch description action sequence
     ld.add_action(lidar_base_launch)
     ld.add_action(lidar_avoidance_node)
 
-    # return launch description
     return ld

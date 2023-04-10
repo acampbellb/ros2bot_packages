@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch_ros.substitutions import FindPackageShare
@@ -11,15 +13,32 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
 
-    rviz_arg = DeclareLaunchArgument(name='use_rviz', default_value='true', choices=['true', 'false'],
+    rviz_config_path = os.path.join(
+        get_package_share_directory('ros2bot_slam'),
+        'config',
+        'slam_toolbox.rviz'
+    ) 
+
+    online_async_config_path = os.path.join(
+        get_package_share_directory('ros2bot_slam'),
+        'config',
+        'mapper_params_online_async.yaml'
+    )    
+
+    localization_config_path = os.path.join(
+        get_package_share_directory('ros2bot_slam'),
+        'config',
+        'mapper_params_localization.yanl'
+    )       
+
+    use_rviz = DeclareLaunchArgument(name='use_rviz', default_value='true', choices=['true', 'false'],
                                     description='Flag to enable GUI')
-    localization_arg = DeclareLaunchArgument(name='localization_mode', default_value='false', choices=['true', 'false'],
+    rviz_config = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
+                                        description='Absolute path to rviz config file')     
+    localization_mode = DeclareLaunchArgument(name='localization_mode', default_value='false', choices=['true', 'false'],
                                             description='Flag to start slam in localization mode')  
-    sim_time_arg = DeclareLaunchArgument(name='use_sim_time', default_value='false', choices=['true', 'false'],
-                                        description='Flag to use simulation / gazebo clock') 
-    rviz_config_path = get_package_share_directory("ros2bot_slam") + '/config/slam_toolbox.yaml'
-    rviz_config_arg = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
-                                            description='Absolute path to rviz config file') 
+    use_sim_time = DeclareLaunchArgument(name='use_sim_time', default_value='false', choices=['true', 'false'],
+                                        description='Flag to use simulation / gazebo clock')     
     
     # include master bringup launch
     master_bringup_launch = IncludeLaunchDescription(
@@ -41,7 +60,8 @@ def generate_launch_description():
         output='screen',
         condition=UnlessCondition(LaunchConfiguration('localization_mode')),   
         parameters=[
-        	get_package_share_directory("ros2bot_slam") + '/config/mapper_params_online_async.yaml'
+        	online_async_config_path,
+            {'use_sim_time':LaunchConfiguration('use_sim_time')}
         ]
     )
 
@@ -49,12 +69,12 @@ def generate_launch_description():
     slam_toolbox_localization_node = Node(
         name='slam_toolbox_localization',        
         package='slam_toolbox',
-        executable='async_slam_toolbox_node',
+        executable='localization_slam_toolbox_node',
         output='screen',
         condition=IfCondition(LaunchConfiguration('localization_mode')),
         parameters=[
-        	get_package_share_directory("ros2bot_slam") + '/config/mapper_params_localization.yaml',
-            {'use_sim_time' : LaunchConfiguration('use_sim_time')}
+        	localization_config_path,
+            {'use_sim_time':LaunchConfiguration('use_sim_time')}
         ]
     )
 
@@ -68,11 +88,12 @@ def generate_launch_description():
         arguments=['-d', LaunchConfiguration('rviz_config')]
     )  
 
+    # launch description action sequence
     ld = LaunchDescription([
-        rviz_arg,
-        localization_arg,
-        sim_time_arg,
-        rviz_config_arg,
+        use_rviz,
+        localization_mode,
+        use_sim_time,
+        rviz_config,
         master_bringup_launch,
         lidar_node_launch,
         slam_toolbox_mapping_node,

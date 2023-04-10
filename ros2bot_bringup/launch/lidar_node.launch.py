@@ -14,8 +14,7 @@ def generate_launch_description():
             FindPackageShare("sllidar_ros2"), '/launch', '/sllidar_s2.launch.py'])
     )
 
-    # add nodes to launch description
+    # launch description action sequence
     ld.add_action(lidar_launch)
 
-    # return launch description
     return ld

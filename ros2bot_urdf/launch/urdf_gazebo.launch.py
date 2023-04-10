@@ -35,7 +35,7 @@ def generate_launch_description():
         ]
     )   
 
-    model_file =  os.path.join(
+    urdf_model =  os.path.join(
         get_package_share_directory('ros2bot_urdf'),
         'urdf',
         'ros2bot.urdf'
@@ -51,7 +51,7 @@ def generate_launch_description():
             '-x', '0',
             '-y', '0',
             '-z', '0',
-            '-file', model_file
+            '-file', urdf_model
         ]
     )
 

@@ -1,27 +1,45 @@
 #!/usr/bin/env python3
 
+import os
+
 from launch_ros.actions import Node
 from launch.substitutions import Command, LaunchConfiguration
 from launch.conditions import IfCondition, UnlessCondition
 from launch_ros.parameter_descriptions import ParameterValue
 from launch.actions import DeclareLaunchArgument
 from launch import LaunchDescription
-from ament_index_python.packages import get_package_share_path
+from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
-    package_path = get_package_share_path('ros2bot_urdf')   
-    model_path = package_path / 'urdf/ros2bot.urdf'
-    rviz_config_path = package_path / 'config/model.rviz'     
 
-    gui_arg = DeclareLaunchArgument(name='use_gui', default_value='true', choices=['true', 'false'],
+    urdf_model_path = os.path.join(
+        get_package_share_directory('ros2bot_urdf'),
+        'urdf',
+        'ros2bot.urdf'
+    ) 
+
+    rviz_config_path = os.path.join(
+        get_package_share_directory('ros2bot_urdf'),
+        'config',
+        'model.rviz'
+    )    
+
+    use_gui = DeclareLaunchArgument(name='use_gui', default_value='true', choices=['true', 'false'],
                                     description='Flag to enable joint_state_publisher_gui')    
-    rviz_config_arg = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
+    rviz_config = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
                                      description='Absolute path to rviz config file')     
-    urdf_arg = DeclareLaunchArgument(name='urdf_model', default_value=str(model_path),
+    urdf_model = DeclareLaunchArgument(name='urdf_model', default_value=str(urdf_model_path),
                                       description='Absolute path to robot urdf file')      
 
     robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('urdf_model')]),
                                        value_type=str)   
+
+    joint_state_publisher_gui_node = Node(
+        name="joint_state_publisher_gui",
+        package="joint_state_publisher_gui",
+        executable="joint_state_publisher_gui",
+        condition=IfCondition(LaunchConfiguration('use_gui'))
+    ) 
 
     joint_state_publisher_node = Node(
         name="join_state_publisher",
@@ -29,13 +47,6 @@ def generate_launch_description():
         executable="joint_state_publisher",
         condition=UnlessCondition(LaunchConfiguration('use_gui'))         
     )
-
-    joint_state_publisher_gui_node = Node(
-        name="joint_state_publisher_gui",
-        package="joint_state_publisher_gui",
-        executable="joint_state_publisher_gui",
-        condition=IfCondition(LaunchConfiguration('use_gui'))
-    )  
 
     robot_state_publisher_node = Node(
         name="robot_state_publisher",
@@ -53,11 +64,11 @@ def generate_launch_description():
     )     
 
     ld = LaunchDescription([
-        gui_arg,
-        rviz_config_arg,
-        urdf_arg,
+        use_gui,
+        rviz_config,
+        urdf_model,
+        joint_state_publisher_gui_node,        
         joint_state_publisher_node,
-        joint_state_publisher_gui_node,
         robot_state_publisher_node,
         rviz_node
     ])

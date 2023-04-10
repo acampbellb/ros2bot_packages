@@ -27,10 +27,9 @@ def generate_launch_description():
             FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
     )
 
-    # add nodes to launch description
+    # launch description action sequence
     ld.add_action(lidar_launch)
     ld.add_action(master_driver_launch)
     ld.add_action(joy_control_launch)
 
-    # return launch description
     return ld

@@ -19,19 +19,18 @@ def generate_launch_description():
     model_path = package_path / 'urdf/ros2bot.urdf' 
     rviz_config_path = package_path / 'config/robot.rviz'
 
-    gui_arg = DeclareLaunchArgument(name='use_gui', default_value='false', choices=['true', 'false'],
+    use_gui = DeclareLaunchArgument(name='use_gui', default_value='false', choices=['true', 'false'],
                                     description='Flag to enable GUI')    
-    rviz_arg = DeclareLaunchArgument(name='use_rviz', default_value='false', choices=['true', 'false'],
+    use_rviz = DeclareLaunchArgument(name='use_rviz', default_value='false', choices=['true', 'false'],
                                     description='Flag to enable GUI')
-    urdf_arg = DeclareLaunchArgument(name='urdf_model', default_value=str(model_path),
+    urdf_model = DeclareLaunchArgument(name='urdf_model', default_value=str(model_path),
                                       description='Absolute path to robot urdf file')  
-    rviz_config_arg = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
+    rviz_config = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
                                      description='Absolute path to rviz config file')      
 
     robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('urdf_model')]),
-                                       value_type=str)    
+                                       value_type=str)   
   
-
     # robot odometry publisher
     base_robot_node = Node(
         name="ros2bot_base",
@@ -96,7 +95,7 @@ def generate_launch_description():
         get_package_share_directory('ros2bot_bringup'),
         'config',
         'robot_localization.yaml'
-        )
+    )
 
     localization_node = Node(
         name="robot_localization",
@@ -145,10 +144,10 @@ def generate_launch_description():
 
     # add nodes to launch description
     ld = LaunchDescription([
-        gui_arg,
-        rviz_arg,
-        urdf_arg,
-        rviz_config_arg,
+        use_gui,
+        use_rviz,
+        urdf_model,
+        rviz_config,
         base_robot_node,
         master_driver_node,
         imu_filter_node,
