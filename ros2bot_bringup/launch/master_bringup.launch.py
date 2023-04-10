@@ -39,26 +39,34 @@ def generate_launch_description():
     robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('urdf_model')]),
                                        value_type=str)   
     
+    # include base robot launch
+    base_robot_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/base_robot.launch.py'])
+    )  
+
     # include master driver launch
     master_driver_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("ros2bot_bringup"), '/launch', '/master_driver.launch.py'])
-    )           
+    )  
 
-    # robot odometry publisher
-    base_robot_node = Node(
-        package="ros2bot_base",
-        executable="ros2bot_base_node",
-        parameters=[
-            {"odom_frame": "odom"},
-            {"base_footprint_frame": "base_footprint"},
-            {"linear_scale_x": 1.0},
-            {"linear_scale_y": 1.0}
-        ],
-        remappings=[
-            ("/sub_vel", "/vel_raw"),
-            ("/pub_odom", "/odom_raw"),
-        ]
+    # include robot localization launch
+    robot_localization_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/robot_localization.launch.py'])
+    ) 
+
+    # included imu filter node launch
+    imu_filter_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/imu_filter.launch.py'])
+    )      
+
+    # included joy control node launch
+    joy_control_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
     )
 
     joint_state_publisher_gui_node = Node(
@@ -82,59 +90,6 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_description}]
     )    
 
-    # filter and fuse imu data
-    imu_filter_node = Node(
-        name="imu_filter",
-        package="imu_filter_madgwick",
-        executable="imu_filter_node",
-        parameters=[
-            {"fixed_frame": "base_link"},
-            {"use_mag": False},
-            {"publish_tf": False},
-            {"use_magnetic_field_msg": False},
-            {"world_frame": "enu"},
-            {"orientation_stddev": 0.05},
-            {"angular_scale": 1.05},
-        ],
-        remapping=[
-            ("/sub_imu", "/imu/imu_raw"),
-            ("/sub_mag", "/mag/mag_raw"),
-            ("/pub_imu", "/imu/imu_data"),
-            ("/pub_mag", "/mag/mag_field"),
-        ]
-    )
-
-    # extended kalman data fusion    
-    localization_config = os.path.join(
-        get_package_share_directory('ros2bot_bringup'),
-        'config',
-        'robot_localization.yaml'
-        )
-
-    localization_node = Node(
-        name="robot_localization",
-        package="robot_localization",
-        executable="ekf_localization_node",
-        output="screen",
-        parameters=[
-            {"odom_frame": "/odom"},
-            {"world_frame": "/odom"},
-            {"base_link_frame": "/base_footprint"},
-            localization_config
-        ],
-        remapping=[
-            ("odometry/filtered", "odom"),
-            ("/imu0", "/imu/imu_data"),
-            ("/odom0", "odom_raw"),
-        ]
-    )
-
-    # included joy control node launch
-    joy_control_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
-    )
-
     rviz_node = Node(
         name="rviz2",
         package='rviz2',
@@ -150,13 +105,13 @@ def generate_launch_description():
         use_rviz,
         urdf_model,
         rviz_config,
-        base_robot_node,
+        base_robot_launch,
         master_driver_launch,
         joint_state_publisher_gui_node,
         joint_state_publisher_node,
         robot_state_publisher_node,        
-        imu_filter_node,
-        localization_node,
+        imu_filter_launch,
+        robot_localization_launch,
         joy_control_launch,
         rviz_node
     ])

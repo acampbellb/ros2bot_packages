@@ -12,18 +12,26 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from ament_index_python.packages import get_package_share_directory
-from ament_index_python.packages import get_package_share_path
 
 def generate_launch_description():
-    package_path = get_package_share_path('ros2bot_urdf')
-    model_path = package_path / 'urdf/ros2bot.urdf' 
-    rviz_config_path = package_path / 'config/robot.rviz'
+
+    urdf_model_path = os.path.join(
+        get_package_share_directory('ros2bot_urdf'),
+        'urdf',
+        'ros2bot.urdf'
+    ) 
+
+    rviz_config_path = os.path.join(
+        get_package_share_directory('ros2bot_bringup'),
+        'config',
+        'robot.rviz'
+    )    
 
     use_gui = DeclareLaunchArgument(name='use_gui', default_value='false', choices=['true', 'false'],
                                     description='Flag to enable GUI')    
     use_rviz = DeclareLaunchArgument(name='use_rviz', default_value='false', choices=['true', 'false'],
                                     description='Flag to enable GUI')
-    urdf_model = DeclareLaunchArgument(name='urdf_model', default_value=str(model_path),
+    urdf_model = DeclareLaunchArgument(name='urdf_model', default_value=str(urdf_model_path),
                                       description='Absolute path to robot urdf file')  
     rviz_config = DeclareLaunchArgument(name='rviz_config', default_value=str(rviz_config_path),
                                      description='Absolute path to rviz config file')      
