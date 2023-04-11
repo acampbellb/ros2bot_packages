@@ -25,6 +25,12 @@ def generate_launch_description():
         get_package_share_directory('ros2bot_bringup'),
         'config',
         'robot.rviz'
+    )
+
+    imu_calib_file = os.path.join(
+        get_package_share_directory('ros2bot_imu_calib'),
+        'config',
+        'imu_calib.yaml'        
     )    
 
     use_gui = DeclareLaunchArgument(name='use_gui', default_value='false', choices=['true', 'false'],
@@ -49,7 +55,25 @@ def generate_launch_description():
     master_driver_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("ros2bot_bringup"), '/launch', '/master_driver.launch.py'])
-    )   
+    )  
+
+    # imu calibration node
+    imu_calib_node = Node(
+        name="imu_calib",
+        package="ros2bot_imu_calib",
+        executable="apply_calib",
+        output="screen",
+        parameters=[
+            {"calib_file": str(imu_calib_file)},
+            {"calibrate_gyros": True}
+        ],
+        remappings=[
+            ("/sub_imu", "/imu/imu_raw"),
+            ("/sub_mag", "/mag/mag_raw"),
+            ("/pub_imu", "/imu/imu_calib"),
+            ("/pub_mag", "/mag/mag_calib")
+        ]        
+    ) 
 
     # included imu filter node launch
     imu_filter_launch = IncludeLaunchDescription(
@@ -69,6 +93,7 @@ def generate_launch_description():
             FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
     )     
 
+    # joint state publisher node
     joint_state_publisher_node = Node(
         name="join_state_publisher",        
         package="joint_state_publisher",
@@ -76,6 +101,7 @@ def generate_launch_description():
         condition=UnlessCondition(LaunchConfiguration('use_gui'))     
     )
 
+    # joint state publisher node (gui version)
     joint_state_publisher_gui_node = Node(
         name="joint_state_publisher_gui",        
         package="joint_state_publisher_gui",
@@ -83,6 +109,7 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('use_gui'))
     )    
 
+    # robot state publisher node
     robot_state_publisher_node = Node(
         name="robot_state_publisher",        
         package="robot_state_publisher",
@@ -98,6 +125,7 @@ def generate_launch_description():
         rviz_config,
         base_robot_launch,
         master_driver_launch,
+        imu_calib_node,
         imu_filter_launch,
         robot_localization_launch,
         joint_state_publisher_gui_node,

@@ -11,6 +11,11 @@
 
   <depend>ros2bot_base</depend>
   <depend>ros2bot_drivers</depend>
+  <depend>ros2bot_controls</depend>
+  <depend>ros2bot_imu_calib</depend>
+  <depend>ros2bot_slam</depend>
+  <depend>ros2bot_lidar</depend>
+  <depend>ros2bot_urdf</depend>
   <depend>robot_localization</depend>
   <depend>imu_filter_madgwick</depend>
   <depend>robot_state_publisher</depend>
