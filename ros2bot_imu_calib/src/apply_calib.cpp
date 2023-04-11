@@ -14,7 +14,7 @@ ApplyCalib::ApplyCalib() : Node("apply_calib_node")
   gyro_bias_z_ = 0.0;
 
   std::string calib_file;
-  std::string package_share_directory = ament_index_cpp::get_package_share_directory("imu_calib");
+  std::string package_share_directory = ament_index_cpp::get_package_share_directory("ros2bot_imu_calib");
   std::string imu_calib_path = package_share_directory + "/config/imu_calib.yaml";
 
   // get parameters
