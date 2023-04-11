@@ -70,9 +70,9 @@ void DoCalib::imu_cb(sensor_msgs::msg::Imu::SharedPtr imu)
       orientations_.pop();
       measurements_received_ = 0;
 
-      std::cout << "Orient IMU with " << orientation_labels_[current_orientation_] << " axis up and press Enter";
+      std::cout << "orient IMU with " << orientation_labels_[current_orientation_] << " axis up and press <enter>";
       std::cin.get();
-      std::cout << "Recording measurements...";
+      std::cout << "recording measurements...";
 
       state_ = RECEIVING;
     }
@@ -89,33 +89,33 @@ void DoCalib::imu_cb(sensor_msgs::msg::Imu::SharedPtr imu)
 
     if (measurements_received_ >= measurements_per_orientation_)
     {
-      std::cout << " Done." << std::endl;
+      std::cout << " done." << std::endl;
       state_ = SWITCHING;
     }
 
     break;
 
   case COMPUTING:
-    std::cout << "Computing calibration parameters...";
+    std::cout << "computing calibration parameters...";
 
     if (calib_.computeCalib())
     {
-      std::cout << " Success!" << std::endl;
-      std::cout << "Saving calibration file...";
+      std::cout << " success!" << std::endl;
+      std::cout << "saving calibration file...";
 
       if (calib_.saveCalib(output_file_))
       {
-        std::cout << " Success!" << std::endl;
+        std::cout << " success!" << std::endl;
       }
       else
       {
-        std::cout << " Failed." << std::endl;
+        std::cout << " failed." << std::endl;
       }
     }
     else
     {
-      std::cout << " Failed.";
-      RCLCPP_ERROR(this->get_logger(), "[DoCalibNode]: Calibration failed");
+      std::cout << " failed.";
+      RCLCPP_ERROR(this->get_logger(), "[DoCalibNode]: calibration failed");
     }
 
     state_ = DONE;

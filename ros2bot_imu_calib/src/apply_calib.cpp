@@ -36,7 +36,7 @@ ApplyCalib::ApplyCalib() : Node("apply_calib_node")
 
   if (!calib_.loadCalib(calib_file) || !calib_.calibReady())
   {
-    RCLCPP_FATAL(this->get_logger(), "Calibration could not be loaded");
+    RCLCPP_FATAL(this->get_logger(), "calibration could not be loaded");
     rclcpp::shutdown();
   }
 
@@ -51,7 +51,7 @@ void ApplyCalib::imu_cb(sensor_msgs::msg::Imu::SharedPtr raw)
 {
   if (calibrate_gyros_)
   {
-    RCLCPP_INFO_ONCE(this->get_logger(), "Calibrating gyros; do not move the IMU");
+    RCLCPP_INFO_ONCE(this->get_logger(), "calibrating gyros; do not move the IMU");
 
     // recursively compute mean gyro measurements
     gyro_sample_count_++;
@@ -61,7 +61,7 @@ void ApplyCalib::imu_cb(sensor_msgs::msg::Imu::SharedPtr raw)
 
     if (gyro_sample_count_ >= gyro_calib_samples_)
     {
-      RCLCPP_INFO(this->get_logger(), "Gyro calibration complete! (bias = [%.3f, %.3f, %.3f])", gyro_bias_x_, gyro_bias_y_, gyro_bias_z_);
+      RCLCPP_INFO(this->get_logger(), "gyro calibration complete! (bias = [%.3f, %.3f, %.3f])", gyro_bias_x_, gyro_bias_y_, gyro_bias_z_);
       calibrate_gyros_ = false;
     }
 
