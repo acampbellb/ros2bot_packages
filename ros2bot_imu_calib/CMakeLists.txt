@@ -46,14 +46,15 @@ add_executable(apply_calib src/apply_calib_node.cpp src/apply_calib.cpp)
 ament_target_dependencies(apply_calib rclcpp sensor_msgs Eigen3 ament_index_cpp)
 target_link_libraries(apply_calib accel_calib)
 
-# install directories
+# install targets
 install(TARGETS 
   accel_calib do_calib apply_calib
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# install directories
 install(DIRECTORY 
-  config
+  config launch
   DESTINATION share/${PROJECT_NAME}
 )
 
