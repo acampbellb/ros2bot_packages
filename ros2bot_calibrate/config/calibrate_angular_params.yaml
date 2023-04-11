@@ -1,5 +1,7 @@
 calibrate_angular_node:
   ros__parameters:
+    # rate
+    rate: 20
     # test angle
     test_angle: 360.0
     # angular speed in radians per second
@@ -10,4 +12,8 @@ calibrate_angular_node:
     odom_angular_scale_correction: 1.0
     # check to start the test
     start_test: False
+    # base frame
+    base_frame: '/base_footprint'
+    # odom frame
+    odom_frame: '/odom'
   
