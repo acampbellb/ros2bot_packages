@@ -59,7 +59,7 @@ class CalibrateAngular(Node):
                 reverse = -reverse      
                 while abs(error) > self.tolerance and self.start_test:
                     start = time()                     
-                    if rclpy.ok() == False : return
+                    if not rclpy.ok() : return
                     # rotate the robot to reduce the error
                     move_cmd = Twist()
                     move_cmd.angular.z = copysign(self.speed, error)
@@ -100,9 +100,15 @@ class CalibrateAngular(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = CalibrateAngular()
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        node = CalibrateAngular()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.get_logger().info('stopping robot...')
+        node.cmd_vel.publish(Twist())
+        node.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()          
