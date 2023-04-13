@@ -12,26 +12,25 @@ def generate_launch_description():
     # included ros2bot base lidar launch
     lidar_base_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/lidar_base.launch.py'])
+            FindPackageShare("ros2bot_lidar"), '/launch', '/lidar_base.launch.py'])
     )
 
-    # ros2bot lidar warning node
-    lidar_warning_node = Node(
-        name="lidar_warning",        
+    # ros2bot lidar avoidance node
+    lidar_avoidance_node = Node(
+        name="lidar_avoidance",        
         package="ros2bot_lidar",
-        executable="lidar_warning_node",
+        executable="lidar_avoidance_node",
         parameters=[
             {"switch" : False},
-            {"laser_angle" : 70},
-            {"response_dist" : 0.5},
-            {"angle_kp" : 3.0},
-            {"angle_ki" : 0.0},
-            {"angle_kd" : 5.0}
+            {"linear" : 0.5},
+            {"angular" : 1.0},
+            {"laser_angle" : 40},
+            {"response_dist" : 0.55}
         ]
     )
 
     # launch description action sequence
     ld.add_action(lidar_base_launch)
-    ld.add_action(lidar_warning_node)
+    ld.add_action(lidar_avoidance_node)
 
     return ld

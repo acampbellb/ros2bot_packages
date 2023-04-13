@@ -42,13 +42,13 @@ def generate_launch_description():
     # include base robot launch
     base_robot_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/base_robot.launch.py'])
+            FindPackageShare("ros2bot_base"), '/launch', '/base_robot.launch.py'])
     )  
 
     # include master driver launch
     master_driver_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/master_driver.launch.py'])
+            FindPackageShare("ros2bot_drivers"), '/launch', '/master_driver.launch.py'])
     )  
 
     # include robot localization launch
@@ -66,7 +66,7 @@ def generate_launch_description():
     # included joy control node launch
     joy_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
+            FindPackageShare("ros2bot_controls"), '/launch', '/joy_control.launch.py'])
     )
 
     joint_state_publisher_gui_node = Node(

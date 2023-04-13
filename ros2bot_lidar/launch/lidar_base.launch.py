@@ -12,19 +12,19 @@ def generate_launch_description():
     # included slamtec s2 rplidar launch
     lidar_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("sllidar_ros2"), '/launch', '/sllidar_s2.launch.py'])
+            FindPackageShare("ros2bot_lidar"), '/launch', '/lidar_node.launch.py'])
     )
 
     # included ros2bot master driver launch
     master_driver_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/master_driver.launch.py'])
+            FindPackageShare("ros2bot_drivers"), '/launch', '/master_driver.launch.py'])
     )
 
     # included ros2bot joy control launch
     joy_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/joy_control.launch.py'])
+            FindPackageShare("ros2bot_controls"), '/launch', '/joy_control.launch.py'])
     )
 
     # launch description action sequence

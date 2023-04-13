@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+
+import os
+
+from glob import glob
 from setuptools import setup
 
 package_name = 'ros2bot_controls'
@@ -10,6 +15,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -20,7 +26,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'joy_node = ros2bot_controls.ros2bot_joy_node:main'
+            'joy_node = ros2bot_controls.ros2bot_joy_node:main',
+            'keyboard_node = ros2bot_controls.ros2bot_keyboard_node:main'
         ],
     },
 )

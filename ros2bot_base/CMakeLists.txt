@@ -26,9 +26,16 @@ find_package(nav_msgs REQUIRED)
 add_executable(ros2bot_base_node src/ros2bot_base_node.cpp)
 ament_target_dependencies(ros2bot_base_node rclcpp std_msgs geometry_msgs sensor_msgs nav_msgs)
 
+# install targets
 install(TARGETS
   ros2bot_base_node
   DESTINATION lib/${PROJECT_NAME}
+)
+
+# install directories
+install(DIRECTORY 
+  launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 ament_package()

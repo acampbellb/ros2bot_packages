@@ -49,7 +49,7 @@ def generate_launch_description():
     # include lidar node launch
     lidar_node_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("ros2bot_bringup"), '/launch', '/lidar_node.launch.py'])
+            FindPackageShare("ros2bot_lidar"), '/launch', '/lidar_node.launch.py'])
     )  
 
     # slam toolbox mapping node
