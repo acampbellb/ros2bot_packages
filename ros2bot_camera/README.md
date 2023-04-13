@@ -132,5 +132,92 @@ then select Plugins -> Configuration -> Dynamic Reconfigure
 
 The ZED ROS 2 node publishes useful diagnostic information aggregated into the /diagnostics topic. Diagnostic information can be analyzed and parsed by using ROS 2 tools, like for example the Runtime Monitor plugin of rqt
 
+# Use OpenCV with ZED in Python
+
+How to capture and display color and depth images using OpenCV and the ZED SDK in Python.
+
+Sample code is available on [GitHub](https://github.com/stereolabs/zed-opencv/tree/master/python). Make sure the [ZED Python API](https://github.com/stereolabs/zed-python-api) is installed before launching the sample.
+
+## Sharing image data between ZED SDK and OpenCV Python
+
+In Python, OpenCV store images in NumPy arrays. Since the ZED SDK uses its own sl.Mat class to store image data, we provide a function get_data() to convert the sl.Mat matrix into a NumPy array.
+
+```
+# Create an RGBA sl.Mat object
+image_zed = sl.Mat(zed.get_camera_information().camera_resolution.width, zed.get_camera_information().camera_resolution.height, sl.MAT_TYPE.U8_C4)
+# Retrieve data in a numpy array with get_data()
+image_ocv = image_zed.get_data()
+```
+
+## Capturing Video
+
+A depth map is a 1-channel matrix with 32-bit float values for each pixel. Each value expresses the distance of a pixel in the scene. The depth map can be retrieved using retrieve_measure() and loaded with get_data() into a NumPy array. Please refer to the [Depth API](https://www.stereolabs.com/docs/depth-sensing/using-depth/) for more information.
+
+```
+# Create a sl.Mat with float type (32-bit)
+depth_zed = sl.Mat(zed.get_camera_information().camera_resolution.width, zed.get_camera_information().camera_resolution.height, sl.MAT_TYPE.F32_C1)
+
+if zed.grab() == sl.ERROR_CODE.SUCCESS :
+    # Retrieve depth data (32-bit)
+    zed.retrieve_measure(depth_zed, sl.MEASURE.DEPTH)
+    # Load depth data into a numpy array
+    depth_ocv = depth_zed.get_data()
+    # Print the depth value at the center of the image
+    print(depth_ocv[int(len(depth_ocv)/2)][int(len(depth_ocv[0])/2)])
+```
+
+## Displaying Depth
+
+A NumPy array with 32-bit float values can’t be displayed with cv2.imshow. To display the depth map, we need to normalize the depth values between 0 and 255 (8-bit) and create a black and white representation. Do not use this representation for other purposes than displaying the image.
+
+```
+# Create an RGBA sl.Mat object
+image_depth_zed = sl.Mat(zed.get_camera_information().camera_resolution.width, sl.get_camera_information().camera_resolution.height, sl.MAT_TYPE.U8_C4)
+
+if zed.grab() == SUCCESS :
+    # Retrieve the normalized depth image
+    zed.retrieve_image(image_depth_zed, sl.VIEW.DEPTH)
+    # Use get_data() to get the numpy array
+    image_depth_ocv = image_depth_zed.get_data()
+    # Display the depth view from the numpy array
+    cv2.imshow("Image", image_depth_ocv)
+```
+
+## UVC Capture
+
+You can also use the ZED as a standard UVC camera in OpenCV to capture raw stereo video using the code snippet below. To get rectified images and calibration with OpenCV, use the native (Python) capture sample available on [GitHub](https://github.com/stereolabs/zed-opencv-native).
+
+```
+import cv2
+import numpy
+
+# Open the ZED camera
+cap = cv2.VideoCapture(0)
+if cap.isOpened() == 0:
+    exit(-1)
+
+# Set the video resolution to HD720 (2560*720)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 2560)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+while True :
+    # Get a new frame from camera
+    retval, frame = cap.read()
+    # Extract left and right images from side-by-side
+    left_right_image = numpy.split(frame, 2, axis=1)
+    # Display images
+    cv2.imshow("frame", frame)
+    cv2.imshow("right", left_right_image[0])
+    cv2.imshow("left", left_right_image[1])
+    if cv2.waitKey(30) >= 0 :
+        break
+
+exit(0)
+```
+
+## Object Detection
+
+See this [tutorial](https://github.com/stereolabs/zed-sdk/tree/master/tutorials/tutorial%206%20-%20object%20detection/python)
+
 
 
