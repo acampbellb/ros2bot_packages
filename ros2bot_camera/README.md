@@ -4,6 +4,12 @@ This package contains nodes for the ZED 2i stereo depth camera.
 
 # Prerequisites
 
+## Install Python ZED SDK
+
+To install the Python ZED SDK, follow these [directions](https://www.stereolabs.com/docs/app-development/python/install/).
+
+## Install ZED ROS2 wrapper package
+
 To install the zed_ros2_wrapper, open a bash terminal, clone the package from Github, and build it:
 
 ```
