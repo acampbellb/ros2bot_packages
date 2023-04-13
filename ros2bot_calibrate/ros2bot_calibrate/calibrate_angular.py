@@ -80,8 +80,8 @@ class CalibrateAngular(Node):
                 # update status flag
                 self.start_test = False
                 # TODO: dynamic parameter
-                #params = {'start_test': False}
-                #dyn_client.update_configuration(params)                
+                # params = {'start_test': False}
+                # dyn_client.update_configuration(params)                
                 # stop robot
                 self.cmd_vel.publish(Twist())
             rclpy.spin_once(self)

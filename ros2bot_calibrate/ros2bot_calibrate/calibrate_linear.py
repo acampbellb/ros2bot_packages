@@ -71,20 +71,29 @@ class CalibrateLinear(Node):
                 if not self.start_test or abs(error) < self.tolerance:
                     self.start_test = False
                     # TODO: dynamic parameters
-                    #params = {'start_test': False}
-                    #dyn_client.update_configuration(params)
+                    # params = {'start_test': False}
+                    # dyn_client.update_configuration(params)
                 else:
                     # if not, move in the appropriate direction
                     if self.direction:
                         move_cmd.linear.x = copysign(self.speed, -1 * error)
                     else:
                         move_cmd.linear.y = copysign(self.speed, -1 * error)   
-                # DEBUG
+                # DEBUG OUTPUT
                 # print("error: ", error)
                 # print("self.speed: ", self.speed)
                 # print("x: ", move_cmd.linear.x)  
-                self.cmd_vel.publish(move_cmd)
-                end = time()                                                               
+                self.cmd_pub.publish(move_cmd)
+                end = time()
+                # print(f'time: {start-end}, distance: {distance}, test_distance: {self.test_distance}, position: {self.position}')
+            else:
+                self.position = self.get_position()
+                x_start = self.position.x
+                y_start = self.position.y
+                self.cmd_pub.publish(Twist())     
+            rclpy.spin_once(self)
+        # stop robot
+        self.cmd_pub.publish(Twist())           
 
     def get_position(self):
         # get the current transform between the odom and base frames               
@@ -104,7 +113,8 @@ def main(args=None):
         pass
     finally:
         node.get_logger().info('stopping robot...')
-        node.cmd_vel.publish(Twist())        
+        node.cmd_vel.publish(Twist())  
+        rclpy.spin_once(node)      
         node.destroy_node()
         rclpy.shutdown()
 
