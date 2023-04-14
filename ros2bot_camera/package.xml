@@ -7,9 +7,17 @@
   <maintainer email="acampbellb@gmail.com">abcampbellb</maintainer>
   <license>MIT</license>
 
+  <depend>zed_ros2_wrapper</depend>
+  <depend>launch_ros</depend>
+  <depend>zed_wrapper</depend>
+	<depend>zed_interfaces</depend>
+	<depend>zed_components</depend>
+	<depend>grid_map_rviz_plugin</depend>
+  <depend>robot_state_publisher</depend>  
   <depend>rclpy</depend>
   <depend>cv_bridge</depend>
-  <depend>zed_ros2_wrapper</depend>
+  <depend>zed_ros2_interfaces</depend>
+  <depend>rviz2</depend>
 
   <export>
     <build_type>ament_python</build_type>
