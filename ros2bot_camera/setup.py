@@ -15,14 +15,15 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'config'), glob('config/*.*')),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='ubuntu',
-    maintainer_email='acampbellb@hotmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer='abcampbellb',
+    maintainer_email='abcampbellb@gmail.com',
+    description='ZED2i camera package',
+    license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
