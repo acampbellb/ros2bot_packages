@@ -39,7 +39,8 @@ def main(args=None):
     image_subscriber = ImageSubscriber()    
     # spin the node so the callback function is called.
     rclpy.spin(image_subscriber)
-    # destroy the node explicitly (optional - otherwise it will be done automatically when the garbage collector destroys the node object)
+    # destroy the node explicitly (optional - otherwise it will be done automatically 
+    # when the garbage collector destroys the node object)
     image_subscriber.destroy_node()  
     # shutdown the ROS client library for Python
     rclpy.shutdown()
