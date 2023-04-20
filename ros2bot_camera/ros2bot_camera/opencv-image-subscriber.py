@@ -25,7 +25,7 @@ class ImageSubscriber(Node):
               
     def listener_callback(self, data):
         # display the message on the console
-        self.get_logger().info('Receiving video frame')    
+        self.get_logger().info('receiving video frame')    
         # convert ROS Image message to OpenCV image
         current_frame = self.br.imgmsg_to_cv2(data)
         # display image
