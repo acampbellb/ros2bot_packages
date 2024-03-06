@@ -4,6 +4,7 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <std_msgs/msg/int32.hpp>
 #include <geometry_msgs/msg/quaternion_stamped.hpp>
+#include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
@@ -32,22 +33,26 @@ public:
         RCLCPP_INFO(this->get_logger(), "[Ros2botBaseNode]: initializing");
 
         // declare parameters w/ defaults
+        this->declare_parameter("wheelbase", 0.25);
         this->declare_parameter("linear_scale_x", 1.0);
         this->declare_parameter("linear_scale_y", 1.0);
         this->declare_parameter("odom_frame", "odom");
         this->declare_parameter("base_footprint_frame", "base_footprint");
+        this->declare_parameter("pub_odom_tf", true);
 
         // get parameters
         rclcpp::Parameter linear_scale_x_param = this->get_parameter("linear_scale_x");
         rclcpp::Parameter linear_scale_y_param = this->get_parameter("linear_scale_y");
         rclcpp::Parameter odom_frame_param = this->get_parameter("odom_frame");
         rclcpp::Parameter base_footprint_frame_param = this->get_parameter("base_footprint_frame");
+        rclcpp::Parameter pub_odom_tf_param = this->get_parameter("pub_odom_tf");
 
         // convert parameters to field values
         linear_scale_x_ = linear_scale_x_param.as_double();
         linear_scale_y_ = linear_scale_y_param.as_double();
         odom_frame_ = odom_frame_param.as_string();
         base_footprint_frame_ = base_footprint_frame_param.as_string();
+        pub_odom_tf_ = pub_odom_tf_param.as_bool();
 
         // initialize remaining fields
         linear_velocity_x_ = 0.0;
@@ -59,11 +64,13 @@ public:
         y_pos_ = 0.0;
         heading_ = 0.0;
 
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+
         // create velocity / geometry twist message subscription
-        velocity_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>("/sub_vel", 50, std::bind(&Ros2botBaseNode::velocity_subscriber_cb, this, _1));
+        velocity_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>("vel_raw", 50, std::bind(&Ros2botBaseNode::velocity_subscriber_cb, this, _1));
 
         // create odometry publisher
-        odometry_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/pub_odom", 50);
+        odometry_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/odom_raw", 50);
 
         RCLCPP_INFO(this->get_logger(), "[Ros2botBaseNode]: initialized");
     }
@@ -74,8 +81,10 @@ private:
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odometry_publisher_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr velocity_subscriber_;
     rclcpp::Time last_velocity_time_;
+    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     std::string odom_frame_;
     std::string base_footprint_frame_;
+    bool pub_odom_tf_;
     double linear_scale_x_;
     double linear_scale_y_;
     double velocity_dt_;
@@ -97,12 +106,14 @@ private:
             msg->angular.x, msg->angular.y, msg->angular.z);            
         RCLCPP_INFO_STREAM(this->get_logger(), "[Ros2botBaseNode]: received twist message '" << msg << "'");
 
-        rclcpp::Time current_time = now();
+        rclcpp::Time current_time = rclcpp::Clock().now();
         linear_velocity_x_ = msg->linear.x * linear_scale_x_;
         linear_velocity_y_ = msg->linear.y * linear_scale_y_;
         angular_velocity_z_ = msg->angular.z;
         velocity_dt_ = (current_time - last_velocity_time_).seconds();
         last_velocity_time_ = current_time;
+
+        double steer_angle = linear_velocity_y_;
 
         // compute odometry given the velocities of the robot
         double delta_heading = angular_velocity_z_ * velocity_dt_; // radians
@@ -119,8 +130,8 @@ private:
         nav_msgs::msg::Odometry odometry_msg;
 
         odometry_msg.header.stamp = current_time;
-        odometry_msg.header.frame_id = odom_frame_;
-        odometry_msg.child_frame_id = base_footprint_frame_;
+        odometry_msg.header.frame_id = odom_frame_; // "odom"
+        odometry_msg.child_frame_id = base_footprint_frame_; // "base_footprint"
 
         // robot position as x, y, z
         odometry_msg.pose.pose.position.x = x_pos_;
@@ -136,6 +147,7 @@ private:
         // linear speed from encoders
         odometry_msg.twist.twist.linear.x = linear_velocity_x_;
         odometry_msg.twist.twist.linear.y = linear_velocity_y_;
+        // odometry_msg.twist.twist.linear.y = 0.0; 
         odometry_msg.twist.twist.linear.z = 0.0;
         odometry_msg.twist.twist.angular.x = 0.0;
         odometry_msg.twist.twist.angular.y = 0.0;
@@ -149,6 +161,27 @@ private:
         // odometry publish
         RCLCPP_INFO(this->get_logger(), "ODOMETRY MESSAGE PUBLISHED");
         odometry_publisher_->publish(odometry_msg);
+
+        // publish odom transform
+        if (pub_odom_tf_)
+        {
+            geometry_msgs::msg::TransformStamped t;
+            rclcpp::Time now = this->get_clock()->now();
+
+            t.header.stamp = now;
+            t.header.frame_id = odom_frame_; // "odom"
+            t.child_frame_id = base_footprint_frame_; // "base_footprint"
+            t.transform.translation.x = x_pos_;
+            t.transform.translation.y = y_pos_;
+            t.transform.translation.z = 0.0;
+
+            t.transform.rotation.x = odometry_quaternion.x;
+            t.transform.rotation.y = odometry_quaternion.y;
+            t.transform.rotation.z = odometry_quaternion.z;
+            t.transform.rotation.w = odometry_quaternion.w;
+
+            tf_broadcaster_->sendTransform(t);
+        }
     }
 
     /// @brief Function create a quaternion message from a yaw value

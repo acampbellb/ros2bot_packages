@@ -9,6 +9,7 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import String, Float32, Int32, Bool
 from ros2bot_master_lib import Ros2botMasterDriver
 from rclpy.node import Node
+from rclpy.clock import Clock
 
 class Ros2botMasterDriverNode(Node):
     def __init__(self):
@@ -27,7 +28,7 @@ class Ros2botMasterDriverNode(Node):
         self.declare_parameter('xlinear_limit', 1.0)
         self.declare_parameter('ylinear_limit', 1.0)
         self.declare_parameter('angular_limit', 5.0)
-        self.declare_parameter('process_cmd_freq', 0.3)
+        self.declare_parameter('process_cmd_freq', 0.2)
 
         # get parameters
         self.imu_link = self.get_parameter('imu_link')
@@ -48,9 +49,9 @@ class Ros2botMasterDriverNode(Node):
         self.joint_state_pub = self.create_publisher(JointState, 'joint_states', 100)
 
         # create publishers w/ absolute named topics
-        self.velocity_pub = self.create_publisher(Twist, '/pub_vel', 100)
-        self.imu_pub = self.create_publisher(Imu, '/pub_imu', 100)
-        self.magnetic_field_pub = self.create_publisher(MagneticField, '/pub_mag', 100)
+        self.velocity_pub = self.create_publisher(Twist, 'vel_raw', 50)
+        self.imu_pub = self.create_publisher(Imu, '/imu/data_raw', 100)
+        self.magnetic_field_pub = self.create_publisher(MagneticField, '/imu/mag', 100)
 
         # start dirver library's receiving thread
         self.master.create_receive_thread()
@@ -62,6 +63,7 @@ class Ros2botMasterDriverNode(Node):
         if not self.timer.is_canceled:
             self.timer.cancel()
 
+    # car motion control, subscriber callback function
     def cmd_velocity_cb(self, msg):
         self.get_logger().info('ros2bot_master_driver node heard velocity msg: "%s"' % msg.data)
         # robot motion control, subscriber callback function
@@ -69,10 +71,9 @@ class Ros2botMasterDriverNode(Node):
             return
 
         # issue linear and angular velocity
-        vx = msg.linear.x
-        vy = msg.linear.y
-        angular = msg.angular.z
-
+        vx = msg.linear.x * 1.0
+        vy = msg.linear.y * 1.0
+        angular = msg.angular.z * 1.0
         # velocity: ±1, angular: ±5
         # trolley motion control, velocity=[-1, 1], angular=[-5, 5]
         self.master.set_bot_motion(vx, vy, angular)
@@ -102,44 +103,50 @@ class Ros2botMasterDriverNode(Node):
     # Publish the speed of the robot, gyroscope data, and battery voltage
     def process_cmd_cb(self):
         if rclpy.ok():
+            time_stamp = Clock().now()
+
             # get master driver data
             ax, ay, az = self.master.get_accelerometer_data()
             gx, gy, gz = self.master.get_gyroscope_data()
             mx, my, mz = self.master.get_magnetometer_data()
             vx, vy, angular = self.master.get_motion_data()
 
+            mx = mx * 1.0
+            my = my * 1.0
+            mz = mz * 1.0
+
             # initialize imu gyroscope
             imu = Imu()
-            imu.header.stamp = self.get_clock().now()
+            imu.header.stamp = time_stamp.to_msg()
             imu.header.frame_id = self.imu_link
-            imu.linear_acceleration.x = ax
-            imu.linear_acceleration.y = ay
-            imu.linear_acceleration.z = az
-            imu.angular_velocity.x = gx
-            imu.angular_velocity.y = gy
-            imu.angular_velocity.z = gz
+            imu.linear_acceleration.x = ax * 1.0
+            imu.linear_acceleration.y = ay * 1.0
+            imu.linear_acceleration.z = az * 1.0
+            imu.angular_velocity.x = gx * 1.0
+            imu.angular_velocity.y = gy * 1.0
+            imu.angular_velocity.z = gz * 1.0
 
             # initialize magnetic gyrocope
             magnetic_field = MagneticField()
-            magnetic_field.header.stamp = self.get_clock().now()
+            magnetic_field.header.stamp = time_stamp.to_msg()
             magnetic_field.header.frame_id = self.imu_link
-            magnetic_field.magnetic_field.x = mx
-            magnetic_field.magnetic_field.y = my
-            magnetic_field.magnetic_field.z = mz
+            magnetic_field.magnetic_field.x = mx * 1.0
+            magnetic_field.magnetic_field.y = my * 1.0
+            magnetic_field.magnetic_field.z = mz * 1.0
 
             # initialize twist
             twist = Twist()
-            twist.linear.x = vx
-            twist.linear.y = vy
-            twist.angular.z = angular
+            twist.linear.x = vx * 1.0
+            twist.linear.y = vy * 1.0
+            twist.angular.z = angular * 1.0
 
             # initialize voltage
             battery_voltage = Float32()
-            battery_voltage.data = self.master.get_battery_voltage()
+            battery_voltage.data = self.master.get_battery_voltage() * 1.0
 
             # initialize edition
             edition = Float32()
-            edition.data = self.master.get_version() 
+            edition.data = self.master.get_version() * 1.0
 
             # initialize joint state
             joint_state = JointState()
