@@ -59,7 +59,7 @@ def generate_launch_description():
 
     # imu calibration node
     imu_calib_node = Node(
-        name="imu_apply_calib",
+        name="imu_calib",
         package="ros2bot_imu_calib",
         executable="apply_calib",
         output="screen",

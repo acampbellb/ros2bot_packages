@@ -23,9 +23,9 @@ class Ros2botLidarTrackerNode(Node):
         
         # declare parameters
         self.declare_parameter('switch', False)
-        self.declare_parameter('laser_angle', 90)
-        self.declare_parameter('priority_angle', 30)
-        self.declare_parameter('response_dist', 1.0)
+        self.declare_parameter('laser_angle', 40.0)
+        self.declare_parameter('priority_angle', 30.0)
+        self.declare_parameter('response_dist', 0.55)
         self.declare_parameter('linear_kp', 2.0)
         self.declare_parameter('linear_ki', 0.0)
         self.declare_parameter('linear_kd', 2.0)
@@ -50,7 +50,7 @@ class Ros2botLidarTrackerNode(Node):
         self.angle_pid = SinglePID(self.angle_kp, self.angle_ki, self.angle_kd)
 
         # create publishers
-        self.vel_pub = self.create_publisher(Twist, '/cmd_vel', 3)
+        self.vel_pub = self.create_publisher(Twist, '/cmd_vel', 1)
 
         # create subscriptions
         self.joy_state_sub = self.create_subscription(Bool, '/joy_state', self.joy_state_cb, 1)
@@ -118,7 +118,9 @@ class Ros2botLidarTrackerNode(Node):
             velocity.angular.z = angle_pid_compute
 
         if angle_pid_compute < 0.02: 
-            velocity.angular.z = 0
+            velocity.angular.z = 0.0
+
+        self.vel_pub.publish(velocity)
 
 def main(args=None):
     rclpy.init(args=args)

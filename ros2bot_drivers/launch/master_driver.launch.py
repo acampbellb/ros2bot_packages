@@ -16,12 +16,13 @@ def generate_launch_description():
             {"ylinear_limit" : 1.0},
             {"angular_limit" : 5.0},
             {"imu_link" : "imu_link"}
-        ],
-        remappings=[
-            ("/pub_vel", "/vel_raw"),
-            ("/pub_imu", "/imu/imu_raw"),    
-            ("/pub_mag", "/mag/mag_raw")        
         ]
+        # ,
+        # remappings=[
+        #     ("/pub_vel", "/vel_raw"),
+        #     ("/pub_imu", "/imu/imu_raw"),    
+        #     ("/pub_mag", "/mag/mag_raw")        
+        # ]
     )
 
     # launch description action sequence

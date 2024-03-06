@@ -49,7 +49,7 @@ class Ros2botJoyTelopNode(Node):
         if not isinstance(msg, Joy): 
             return
 
-        if self.user_name == "jetson": 
+        if self.user_name == "jetson": # -or- 'root'
             self.user_jetson(msg)
         else: 
             self.user_pc(msg)

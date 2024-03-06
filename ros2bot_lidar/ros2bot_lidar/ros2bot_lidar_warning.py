@@ -24,8 +24,8 @@ class Ros2botLidarWarningNode(Node):
 
         # declare parameters
         self.declare_parameter('switch', False)
-        self.declare_parameter('laser_angle', 70)
-        self.declare_parameter('response_dist', 0.5)
+        self.declare_parameter('laser_angle', 40.0)
+        self.declare_parameter('response_dist', 0.55)
         self.declare_parameter('angle_kp', 3.0)
         self.declare_parameter('angle_ki', 0.0)
         self.declare_parameter('angle_kd', 5.0)
@@ -42,7 +42,7 @@ class Ros2botLidarWarningNode(Node):
         self.angle_pid = SinglePID(self.angle_kp, self.angle_ki, self.angle_kd)
 
         # create publishers
-        self.vel_pub = self.create_publisher(Twist, '/cmd_vel', 3)
+        self.vel_pub = self.create_publisher(Twist, '/cmd_vel', 1)
         self.buzzer_pub = self.create_publisher(Bool, '/buzzer', 1)
 
         # create subscriptions
@@ -114,7 +114,7 @@ class Ros2botLidarWarningNode(Node):
             velocity.angular.z = angle_pid_compute
 
         if angle_pid_compute < 0.02: 
-            velocity.angular.z = 0
+            velocity.angular.z = 0.0
 
         self.vel_pub.publish(velocity)
 

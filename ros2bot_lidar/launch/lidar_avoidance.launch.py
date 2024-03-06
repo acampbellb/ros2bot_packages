@@ -24,7 +24,7 @@ def generate_launch_description():
             {"switch" : False},
             {"linear" : 0.5},
             {"angular" : 1.0},
-            {"laser_angle" : 40},
+            {"laser_angle" : 40.0},
             {"response_dist" : 0.55}
         ]
     )

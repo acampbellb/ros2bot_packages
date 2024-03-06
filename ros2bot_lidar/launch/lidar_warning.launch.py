@@ -22,8 +22,8 @@ def generate_launch_description():
         executable="lidar_warning_node",
         parameters=[
             {"switch" : False},
-            {"laser_angle" : 70},
-            {"response_dist" : 0.5},
+            {"laser_angle" : 40.0},
+            {"response_dist" : 0.55},
             {"angle_kp" : 3.0},
             {"angle_ki" : 0.0},
             {"angle_kd" : 5.0}

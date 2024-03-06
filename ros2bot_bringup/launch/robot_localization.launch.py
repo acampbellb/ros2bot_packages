@@ -26,12 +26,13 @@ def generate_launch_description():
             {"world_frame": "/odom"},
             {"base_link_frame": "/base_footprint"},
             localization_config
-        ],
-        remapping=[
-            ("odometry/filtered", "odom"),
-            ("/imu0", "/imu/imu_data"),
-            ("/odom0", "odom_raw"),
         ]
+        # ,
+        # remapping=[
+        #     ("odometry/filtered", "odom"),
+        #     ("/imu0", "/imu/imu_data"),
+        #     ("/odom0", "odom_raw"),
+        # ]
     )
 
     # launch description action sequence

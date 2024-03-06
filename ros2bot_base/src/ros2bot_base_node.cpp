@@ -46,6 +46,7 @@ public:
         rclcpp::Parameter odom_frame_param = this->get_parameter("odom_frame");
         rclcpp::Parameter base_footprint_frame_param = this->get_parameter("base_footprint_frame");
         rclcpp::Parameter pub_odom_tf_param = this->get_parameter("pub_odom_tf");
+        rclcpp::Parameter wheelbase_param = this->get_parameter("wheelbase");
 
         // convert parameters to field values
         linear_scale_x_ = linear_scale_x_param.as_double();
@@ -53,6 +54,7 @@ public:
         odom_frame_ = odom_frame_param.as_string();
         base_footprint_frame_ = base_footprint_frame_param.as_string();
         pub_odom_tf_ = pub_odom_tf_param.as_bool();
+        wheelbase_ = wheelbase_param.as_double();
 
         // initialize remaining fields
         linear_velocity_x_ = 0.0;
@@ -94,6 +96,7 @@ private:
     double linear_velocity_x_;
     double linear_velocity_y_;
     double angular_velocity_z_;
+    double wheelbase_;
 
     // methods
 

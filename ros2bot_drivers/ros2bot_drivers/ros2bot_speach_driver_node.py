@@ -7,6 +7,7 @@ from std_msgs.msg import String, Float32, Int32, Bool
 from ros2bot_master_lib import Ros2botMasterDriver
 from ros2bot_speach_lib import Ros2botSpeachDriver
 from rclpy.node import Node
+from rclpy.clock import Clock
 
 class Ros2botSpeachDriverNode(Node):
     def __init__(self):
@@ -24,7 +25,7 @@ class Ros2botSpeachDriverNode(Node):
         self.process_cmd_freq = self.get_parameter('process_cmd_freq')
 
         # create subscriptions
-        self.sub_cmd_velocity = self.create_subscription(Twist, 'cmd_vel', self.cmd_velocity_cb, 1)
+        self.sub_cmd_velocity = self.create_subscription(Twist, 'vel_raw', self.cmd_velocity_cb, 1)
         self.sub_joy_state = self.create_subscription(Bool, '/joy_state', self.joy_state_cb)
 
         # create publishers
@@ -38,6 +39,7 @@ class Ros2botSpeachDriverNode(Node):
         if not self.timer.is_canceled:
             self.timer.cancel()
 
+    # car motion control, subscriber callback function
     def cmd_velocity_cb(self, msg):
         self.get_logger().info('ros2bot_speach_driver node heard velocity msg: "%s"' % msg.data)
 
@@ -46,9 +48,9 @@ class Ros2botSpeachDriverNode(Node):
             return
 
 		# issue linear and angular velocity
-        vx = msg.linear.x
-        vy = msg.linear.y
-        angular = msg.angular.z
+        vx = msg.linear.x * 1.0
+        vy = msg.linear.y * 1.0
+        angular = msg.angular.z * 1.0
 
 		# linear: ±1, angular: ±5
 		# trolley motion control,vesl=[-1, 1], angular=[-5, 5]

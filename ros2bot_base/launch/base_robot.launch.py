@@ -14,12 +14,14 @@ def generate_launch_description():
             {"odom_frame": "odom"},
             {"base_footprint_frame": "base_footprint"},
             {"linear_scale_x": 1.0},
-            {"linear_scale_y": 1.0}
-        ],
-        remappings=[
-            ("/sub_vel", "/vel_raw"),
-            ("/pub_odom", "/odom_raw"),
+            {"linear_scale_y": 1.0},
+            {"pub_odom_tf", True}
         ]
+        # ,
+        # remappings=[
+        #     ("/sub_vel", "/vel_raw"),
+        #     ("/pub_odom", "/odom_raw"),
+        # ]
     )
 
     # launch description action sequence
