@@ -19,7 +19,7 @@ def generate_launch_description():
     lidar_tracker_node = Node(
         name="lidar_tracker",        
         package="ros2bot_lidar",
-        executable="lidar_tracker_node",
+        executable="ros2bot_lidar_tracker_node",
         parameters=[
             {"switch" : False},
             {"priority_angle" : 30},

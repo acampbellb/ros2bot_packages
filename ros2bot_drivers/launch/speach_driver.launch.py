@@ -10,12 +10,9 @@ def generate_launch_description():
     speach_driver_node = Node(
         name="speach_driver",
         package="ros2bot_drivers",
-        executable="speach_driver_node",
+        executable="ros2bot_speach_driver_node",
         parameters=[
-            {"xlinear_speed_limit": 1.0},
-            {"ylinear_speed_limit": 1.0},
-            {"angular_speed_limit": 5.0},
-            {"imu_link": "imu_link"}
+            {"process_cmd_freq", 0.2}
         ]
         # ,
         # remappings=[

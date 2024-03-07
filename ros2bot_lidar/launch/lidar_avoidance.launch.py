@@ -19,7 +19,7 @@ def generate_launch_description():
     lidar_avoidance_node = Node(
         name="lidar_avoidance",        
         package="ros2bot_lidar",
-        executable="lidar_avoidance_node",
+        executable="ros2bot_lidar_avoidance_node",
         parameters=[
             {"switch" : False},
             {"linear" : 0.5},

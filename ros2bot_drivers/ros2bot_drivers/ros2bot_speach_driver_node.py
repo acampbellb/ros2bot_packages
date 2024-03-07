@@ -19,7 +19,7 @@ class Ros2botSpeachDriverNode(Node):
         self.speach = Ros2botSpeachDriver()
 
         # declare parameters
-        self.declare_parameter('process_cmd_freq', 0.3)
+        self.declare_parameter('process_cmd_freq', 0.2)
 
         # get parameters
         self.process_cmd_freq = self.get_parameter('process_cmd_freq')

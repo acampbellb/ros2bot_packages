@@ -8,9 +8,9 @@ def generate_launch_description():
 
     # robot low-level master driver node
     master_driver_node = Node(
-        name="master_driver",
+        name="master_speach_driver",
         package="ros2bot_drivers",
-        executable="ros2bot_master_driver_node",
+        executable="ros2bot_master_speach_driver_node",
         parameters=[
             {"xlinear_limit" : 1.0},
             {"ylinear_limit" : 1.0},
